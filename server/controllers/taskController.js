@@ -3,7 +3,9 @@ const Task = require("../models/Task");
 // GET all tasks for the logged-in user (can filter later by status)
 const getTasks = async (req, res) => {
   try {
-    const tasks = await Task.find({ createdBy: req.user._id }).populate("assignedTo", "name email");
+    const tasks = await Task.find()
+      .populate("createdBy", "name email")
+      .populate("assignedTo", "name email");
     res.status(200).json(tasks);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -31,6 +33,7 @@ const createTask = async (req, res) => {
 
     const saved = await newTask.save();
     res.status(201).json(saved);
+    console.log("Task created:", saved);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -52,8 +55,10 @@ const updateTask = async (req, res) => {
 
     const updated = await Task.findByIdAndUpdate(id, req.body, { new: true });
     res.status(200).json(updated);
+    console.log("Task updated:", updated);
   } catch (error) {
     res.status(500).json({ message: error.message });
+    console.error("line. 59 Error updating task:", error);
   }
 };
 
@@ -72,8 +77,10 @@ const deleteTask = async (req, res) => {
 
     await task.deleteOne();
     res.status(200).json({ message: "Task deleted" });
+    console.log("Task deleted:", id);
   } catch (error) {
     res.status(500).json({ message: error.message });
+    console.error("line. 77 Error deleting task:", error);
   }
 };
 

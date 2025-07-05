@@ -2,9 +2,10 @@ import React, { useState } from "react";
 import API from "../api/api";
 import { useNavigate, Link } from "react-router-dom";
 import "./../components/AuthForm.css";
+import { toast } from "react-toastify";
 
 function Register() {
-  const [form, setForm] = useState({ name: "", email: "", password: "" });
+  const [form, setForm] = useState({ name: "", username: "", email: "", password: "" });
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -18,7 +19,8 @@ function Register() {
       localStorage.setItem("user", JSON.stringify(res.data));
       navigate("/");
     } catch (err) {
-      alert("User already exists or something went wrong.");
+      toast.error("Registration failed. Please check your details.");
+      console.error("Registration error:", err);
     }
   };
 
@@ -32,6 +34,14 @@ function Register() {
           placeholder="Full Name"
           required
           value={form.name}
+          onChange={handleChange}
+        />
+        <input
+          type="text"
+          name="username"
+          placeholder="Username"
+          required
+          value={form.username}
           onChange={handleChange}
         />
         <input

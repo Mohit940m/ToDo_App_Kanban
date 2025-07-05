@@ -5,18 +5,25 @@ const generateToken = require('../utils/jwtHelper');
 
 // Register a new user
 const registerUser = async (req, res) => {
-    const { name, email, password } = req.body;
+    const { name, username, email, password } = req.body;
 
     try {
-        const userExists = await User.findOne({ email });
-        if (userExists)
-            return res.status(400).json({ message: 'User already exists' });
+        let userExists = await User.findOne({ email });
+        if (userExists) {
+            return res.status(400).json({ message: 'User with this email already exists' });
+        }
+
+        userExists = await User.findOne({ username });
+        if (userExists) {
+            return res.status(400).json({ message: 'Username is already taken' });
+        }
+
 
         const salt = await bcrypt.genSalt(10);
         const hashed = await bcrypt.hash(password, salt);
 
 
-        const user = await User.create({ name, email, password: hashed });
+        const user = await User.create({ name, username, email, password: hashed });
 
         const token = generateToken(user._id);
 
@@ -27,7 +34,7 @@ const registerUser = async (req, res) => {
             token,
         });
     } catch (error) {
-        console.error(error);
+        console.error("Register error:", error.message);
         res.status(500).json({ message: 'Server error' });
     }
 };

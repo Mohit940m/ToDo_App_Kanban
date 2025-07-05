@@ -5,10 +5,51 @@ const connectDB = require('./config/db');
 const userRoutes = require("./routes/userRoutes");
 const taskRoutes = require("./routes/taskRoutes");
 
+const http = require("http");
+const { Server } = require("socket.io");
+
+// Initialize environment variables and connect to the database
 dotenv.config();
 connectDB();
 
 const app = express();
+
+const server = http.createServer(app);
+
+// Initialize Socket.IO
+const io = new Server(server, {
+  cors: {
+    origin: process.env.CLIENT_URL, // from .env
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true,
+  },
+});
+
+io.on("connection", (socket) => {
+  console.log("👤 New user connected:", socket.id);
+
+  // Listen for task updates
+  socket.on("task-updated", (data) => {
+    socket.broadcast.emit("task-updated", data); // broadcast to all other clients
+    console.log("Task updated:", data);
+  });
+
+  // Listen for task deletion
+  socket.on("task-deleted", (taskId) => {
+    socket.broadcast.emit("task-deleted", taskId);
+  });
+
+  // Listen for new task addition
+  socket.on("task-added", (task) => {
+    socket.broadcast.emit("task-added", task);
+  });
+
+  
+  // Handle disconnection
+  socket.on("disconnect", () => {
+    console.log("❌ User disconnected:", socket.id);
+  });
+});
 
 app.use(cors({
     origin: process.env.CLIENT_URL,
@@ -25,4 +66,6 @@ app.get('/', (req, res) =>{
 });
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, ()=> console.log(`Server is running on port ${PORT}`));
+server.listen(PORT, () =>
+  console.log(`Server running on port ${PORT}`)
+);
