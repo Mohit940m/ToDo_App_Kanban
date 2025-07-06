@@ -46,21 +46,40 @@ const createTask = async (req, res) => {
 // UPDATE a task
 const updateTask = async (req, res) => {
   const { id } = req.params;
+  const { force, ...updatePayload } = req.body; // Separate force flag from payload
 
   try {
-    const task = await Task.findById(id);
+    const taskOnServer = await Task.findById(id);
 
-    if (!task) return res.status(404).json({ message: "Task not found" });
+    if (!taskOnServer) return res.status(404).json({ message: "Task not found" });
 
     // Allow creator or assigned user to update the task
-    const isCreator = task.createdBy && task.createdBy.toString() === req.user._id.toString();
-    const isAssigned = task.assignedTo && task.assignedTo.toString() === req.user._id.toString();
+    const isCreator = taskOnServer.createdBy && taskOnServer.createdBy.toString() === req.user._id.toString();
+    const isAssigned = taskOnServer.assignedTo && taskOnServer.assignedTo.toString() === req.user._id.toString();
     
     if (!isCreator && !isAssigned) {
       return res.status(403).json({ message: "Not allowed to update this task" });
     }
 
-    const updated = await Task.findByIdAndUpdate(id, req.body, { new: true })
+    // --- Conflict Detection ---
+    // If the client sends an `updatedAt` and is not forcing the update, check for conflicts.
+    if (updatePayload.updatedAt && !force) {
+      const clientLastUpdate = new Date(updatePayload.updatedAt).getTime();
+      const serverLastUpdate = new Date(taskOnServer.updatedAt).getTime();
+
+      // If the server version is newer, there's a conflict.
+      if (serverLastUpdate > clientLastUpdate) {
+        const populatedTask = await Task.findById(id)
+          .populate("createdBy", "name email")
+          .populate("assignedTo", "name email");
+        return res.status(409).json({
+          message: "Conflict: This task has been updated by someone else.",
+          serverTask: populatedTask,
+        });
+      }
+    }
+
+    const updated = await Task.findByIdAndUpdate(id, updatePayload, { new: true })
       .populate("createdBy", "name email")
       .populate("assignedTo", "name email");
     res.status(200).json(updated);

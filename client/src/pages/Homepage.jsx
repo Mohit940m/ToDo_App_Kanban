@@ -8,6 +8,7 @@ import { io } from "socket.io-client";
 import TaskCard from "../components/TaskCard"; // Ensure the path is correct
 import TaskModal from "../components/TaskModal";
 import DeleteConfirmationModal from "../components/DeleteConfirmationModal";
+import ConflictResolutionModal from "../components/ConflictResolutionModal";
 
 
 const socket = io(import.meta.env.VITE_API_URL);
@@ -20,6 +21,7 @@ function Homepage() {
   const [selectedTask, setSelectedTask] = useState(null);
   const [users, setUsers] = useState([]); // Populate from API
   const [taskToDelete, setTaskToDelete] = useState(null);
+  const [conflict, setConflict] = useState(null);
 
   // Fetch users
   const getUsers = async () => {
@@ -91,6 +93,21 @@ function Homepage() {
     setTaskToDelete(task); // Open the confirmation modal
   };
 
+  // --- Conflict Resolution Handlers ---
+  const handleOverwrite = () => {
+    if (conflict) {
+      handleTaskUpdate(conflict.localTask, { force: true });
+    }
+  };
+
+  const handleDiscard = () => {
+    if (conflict) {
+      // Update local state with server's version
+      setTasks(prev => prev.map(t => t._id === conflict.serverTask._id ? conflict.serverTask : t));
+      setConflict(null);
+      toast.info("Your changes have been discarded.");
+    }
+  };
   useEffect(() => {
     getTasks();
     getUsers();
@@ -173,35 +190,57 @@ function Homepage() {
     if (task.status === newStatus) return;
 
     try {
+      // Pass the original task's updatedAt to the server for conflict check
       const res = await API.put(`/api/tasks/${taskId}`, {
         ...task,
         status: newStatus,
       });
 
-      setTasks((prev) =>
-        prev.map((t) => (t._id === taskId ? res.data : t))
-      );
+      setTasks((prev) => prev.map((t) => (t._id === taskId ? res.data : t)));
 
       // 🔊 Emit socket event
       socket.emit("task-updated", res.data);
       toast.success(`Task moved to ${newStatus}`);
     } catch (err) {
-      console.error("Failed to move task:", err);
-      toast.error("Failed to move task.");
+      if (err.response && err.response.status === 409) {
+        toast.warn("Could not move task due to a conflict. Board is refreshing.");
+        // Refresh the entire board to get the latest state
+        getTasks();
+      } else {
+        console.error("Failed to move task:", err);
+        toast.error("Failed to move task.");
+      }
     }
   };
 
   // Handle task update
-  const handleTaskUpdate = async (updatedTask) => {
+  const handleTaskUpdate = async (updatedTask, options = {}) => {
     try {
-      const res = await API.put(`/api/tasks/${updatedTask._id}`, updatedTask);
+      const payload = { ...updatedTask };
+      if (options.force) {
+        payload.force = true;
+      }
+
+      const res = await API.put(`/api/tasks/${updatedTask._id}`, payload);
       setTasks((prev) =>
         prev.map((t) => (t._id === updatedTask._id ? res.data : t))
       );
       socket.emit("task-updated", res.data);
       toast.success("Task updated!");
+      setConflict(null); // Close conflict modal if it was open
     } catch (err) {
-      toast.error("Failed to update task");
+      if (err.response && err.response.status === 409) {
+        // CONFLICT DETECTED
+        toast.error("Conflict! This task was updated by someone else.");
+        setSelectedTask(null); // Close the edit modal
+        setConflict({
+          localTask: updatedTask,
+          serverTask: err.response.data.serverTask,
+        });
+      } else {
+        toast.error("Failed to update task");
+        console.error("Update error:", err);
+      }
     }
   };
 
@@ -260,6 +299,15 @@ function Homepage() {
           taskTitle={taskToDelete.title}
           onConfirm={handleDeleteConfirm}
           onCancel={() => setTaskToDelete(null)}
+        />
+      )}
+
+      {conflict && (
+        <ConflictResolutionModal
+          localTask={conflict.localTask}
+          serverTask={conflict.serverTask}
+          onOverwrite={handleOverwrite}
+          onDiscard={handleDiscard}
         />
       )}
     </div>
