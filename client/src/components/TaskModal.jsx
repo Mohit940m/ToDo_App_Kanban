@@ -1,10 +1,20 @@
 import React, { useState, useEffect } from "react";
 import "./TaskModal.css";
 
-function TaskModal({ task, users, onClose, onSave }) {
+function TaskModal({ task, users, onClose, onSave, onDelete, currentUser }) {
   const [editedTask, setEditedTask] = useState({ ...task });
   const [isEditingDescription, setIsEditingDescription] = useState(false);
 
+  // Determine if the current user is the creator of the task
+  const isCreator = task.createdBy?._id === currentUser?._id;
+  const isAssigned = task.assignedTo?._id === currentUser?._id;
+
+  // Define editing permissions based on user role
+  const canEditTitle = isCreator;
+  const canEditDescription = isCreator || isAssigned;
+  const canEditAssignments = isCreator; // For Priority and Assignee
+  const canTakeAction = isCreator || isAssigned;
+  
   useEffect(() => {
     setEditedTask({ ...task });
   }, [task]);
@@ -12,6 +22,10 @@ function TaskModal({ task, users, onClose, onSave }) {
   const handleSave = () => {
     onSave(editedTask);
     onClose();
+  };
+
+  const handleDelete = () => {
+    onDelete(task);
   };
 
   const getPriorityColor = (priority) => {
@@ -85,6 +99,7 @@ function TaskModal({ task, users, onClose, onSave }) {
                 setEditedTask({ ...editedTask, title: e.target.value })
               }
               placeholder="Enter task title"
+              disabled={!canEditTitle}
             />
           </div>
 
@@ -120,9 +135,14 @@ function TaskModal({ task, users, onClose, onSave }) {
                 </div>
               </div>
             ) : (
-              <div className="description-display" onClick={() => setIsEditingDescription(true)}>
-                <p>{editedTask.description || "Click to add description..."}</p>
-                <span className="edit-icon">✏️</span>
+              <div 
+                className={`description-display ${!canEditDescription ? 'disabled' : ''}`}
+                onClick={canEditDescription ? () => setIsEditingDescription(true) : undefined}
+              >
+                <p>{editedTask.description || (canEditDescription ? "Click to add description..." : "No description")}</p>
+                {canEditDescription && (
+                  <span className="edit-icon">✏️</span>
+                )}
               </div>
             )}
           </div>
@@ -131,6 +151,7 @@ function TaskModal({ task, users, onClose, onSave }) {
           <div className="form-group">
             <label>Assign to</label>
             <select
+              disabled={!canEditAssignments}
               value={editedTask.assignedTo?._id || editedTask.assignedTo || ""}
               onChange={(e) => {
                 const selectedUser = users.find(u => u._id === e.target.value);
@@ -153,6 +174,7 @@ function TaskModal({ task, users, onClose, onSave }) {
           <div className="form-group">
             <label>Priority</label>
             <select
+              disabled={!canEditAssignments}
               value={editedTask.priority}
               onChange={(e) =>
                 setEditedTask({ ...editedTask, priority: e.target.value })
@@ -168,6 +190,7 @@ function TaskModal({ task, users, onClose, onSave }) {
           <div className="form-group">
             <label>Status</label>
             <select
+              disabled={!canTakeAction}
               value={editedTask.status}
               onChange={(e) =>
                 setEditedTask({ ...editedTask, status: e.target.value })
@@ -203,12 +226,21 @@ function TaskModal({ task, users, onClose, onSave }) {
 
         {/* Modal Actions */}
         <div className="modal-actions">
-          <button className="save-btn" onClick={handleSave}>
-            💾 Save Changes
-          </button>
-          <button className="cancel-btn" onClick={onClose}>
-            ❌ Cancel
-          </button>
+          {isCreator && (
+            <button className="delete-btn" onClick={handleDelete}>
+              🗑️ Delete Task
+            </button>
+          )}
+          {canTakeAction && (
+            <>
+              <button className="save-btn" onClick={handleSave}>
+                💾 Save Changes
+              </button>
+              <button className="cancel-btn" onClick={onClose}>
+                ❌ Cancel
+              </button>
+            </>
+          )}
         </div>
       </div>
     </div>

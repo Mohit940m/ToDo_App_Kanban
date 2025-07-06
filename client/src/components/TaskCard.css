@@ -5,6 +5,7 @@
   margin-bottom: 10px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   border: 1px solid #e0e0e0;
+  position: relative; /* Needed for absolute positioning of children */
   transition: all 0.2s ease;
 }
 
@@ -66,4 +67,35 @@
 
 .priority-high {
   border-left: 5px solid red;
+}
+
+.delete-task-btn {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  background-color: rgba(255, 255, 255, 0.8);
+  border: 1px solid #eee;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0; /* Hidden by default, shown on card hover */
+  transition: opacity 0.2s ease, background-color 0.2s ease;
+}
+
+.task-card:hover .delete-task-btn {
+  opacity: 1;
+}
+
+.delete-task-btn img {
+  width: 12px;
+  height: 12px;
+}
+
+.delete-task-btn:hover {
+  background-color: #ffebee; /* Light red */
 }

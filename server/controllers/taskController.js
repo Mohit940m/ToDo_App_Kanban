@@ -56,10 +56,9 @@ const updateTask = async (req, res) => {
     const isCreator = task.createdBy && task.createdBy.toString() === req.user._id.toString();
     const isAssigned = task.assignedTo && task.assignedTo.toString() === req.user._id.toString();
     
-    // For now, allow anyone to update tasks (you can uncomment the restriction below if needed)
-    // if (!isCreator && !isAssigned) {
-    //   return res.status(403).json({ message: "Not allowed to update this task" });
-    // }
+    if (!isCreator && !isAssigned) {
+      return res.status(403).json({ message: "Not allowed to update this task" });
+    }
 
     const updated = await Task.findByIdAndUpdate(id, req.body, { new: true })
       .populate("createdBy", "name email")

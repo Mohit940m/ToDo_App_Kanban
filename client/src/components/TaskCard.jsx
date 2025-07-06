@@ -1,9 +1,17 @@
 import React from "react";
 import "./TaskCard.css";
+import deleteIcon from "../assets/close.svg";
 
-function TaskCard({ task, onClick, currentUser }) {
-  // Allow dragging for unassigned tasks or tasks assigned to current user
-  const isDraggable = !task.assignedTo || task.assignedTo?._id === currentUser._id;
+function TaskCard({ task, onClick, currentUser, onDeleteClick }) {
+  // Allow dragging only for the creator or the assigned user.
+  const isCreator = task.createdBy?._id === currentUser._id;
+  const isAssigned = task.assignedTo?._id === currentUser._id;
+  const isDraggable = isCreator || isAssigned;
+
+  const handleDelete = (e) => {
+    e.stopPropagation(); // Prevent opening the edit modal
+    onDeleteClick(task);
+  };
 
   const handleDragStart = (e) => {
     console.log("Drag started for task:", task._id);
@@ -51,6 +59,13 @@ function TaskCard({ task, onClick, currentUser }) {
           Assigned to: {task.assignedTo?.name || "Unassigned"}
         </small>
       </div>
+
+      {/* 🔹 Delete Button */}
+      {isCreator && (
+        <button className="delete-task-btn" onClick={handleDelete}>
+          <img src={deleteIcon} alt="Delete Task" />
+        </button>
+      )}
     </div>
   );
 }

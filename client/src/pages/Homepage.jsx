@@ -7,6 +7,7 @@ import { toast } from "react-toastify";
 import { io } from "socket.io-client";
 import TaskCard from "../components/TaskCard"; // Ensure the path is correct
 import TaskModal from "../components/TaskModal";
+import DeleteConfirmationModal from "../components/DeleteConfirmationModal";
 
 
 const socket = io(import.meta.env.VITE_API_URL);
@@ -18,6 +19,7 @@ function Homepage() {
 
   const [selectedTask, setSelectedTask] = useState(null);
   const [users, setUsers] = useState([]); // Populate from API
+  const [taskToDelete, setTaskToDelete] = useState(null);
 
   // Fetch users
   const getUsers = async () => {
@@ -51,6 +53,9 @@ function Homepage() {
       });
 
       setTasks((prev) => [...prev, res.data]);
+      // 🔊 Emit socket event for other users
+      socket.emit("task-added", res.data);
+
       setNewTitle("");
       toast.success("Task added successfully!");
     } catch (error) {
@@ -74,9 +79,28 @@ function Homepage() {
     }
   };
 
+  const handleDeleteConfirm = () => {
+    if (taskToDelete) {
+      deleteTask(taskToDelete._id);
+      setTaskToDelete(null);
+    }
+  };
+
+  const handleModalDelete = (task) => {
+    setSelectedTask(null); // Close the edit modal
+    setTaskToDelete(task); // Open the confirmation modal
+  };
+
   useEffect(() => {
     getTasks();
     getUsers();
+
+    // --- Socket.io event listeners for real-time updates ---
+
+    socket.on("task-added", (newTask) => {
+      setTasks((prevTasks) => [...prevTasks, newTask]);
+      toast.info(`A new task was added: "${newTask.title}"`);
+    });
 
     // Socket.io event listeners
     socket.on("task-updated", (updatedTask) => {
@@ -85,20 +109,27 @@ function Homepage() {
           task._id === updatedTask._id ? updatedTask : task
         )
       );
+      toast.info(`Task "${updatedTask.title}" was updated.`);
     });
 
     socket.on("task-deleted", (taskId) => {
+      // Find task before filtering to show its name in the toast
+      const deletedTask = tasks.find((task) => task._id === taskId);
       setTasks((prevTasks) =>
         prevTasks.filter((task) => task._id !== taskId)
       );
+      if (deletedTask) {
+        toast.warn(`Task "${deletedTask.title}" was deleted.`);
+      }
     });
 
     // Cleanup function to remove event listeners
     return () => {
+      socket.off("task-added");
       socket.off("task-updated");
       socket.off("task-deleted");
     };
-  }, []);
+  }, [tasks]); // Add `tasks` to dependency array to avoid stale state in listeners
 
   // Group tasks by status
   const groupedTasks = {
@@ -130,9 +161,12 @@ function Homepage() {
       return;
     }
 
-    // Allow moving unassigned tasks or tasks assigned to current user
-    if (task.assignedTo && task.assignedTo._id !== user._id) {
-      toast.warn("Only assigned user can move this task");
+    // Allow moving only by the creator or the assigned user.
+    const isCreator = task.createdBy?._id === user._id;
+    const isAssigned = task.assignedTo?._id === user._id;
+
+    if (!isCreator && !isAssigned) {
+      toast.warn("Only the creator or assigned user can move this task.");
       return;
     }
     
@@ -171,6 +205,8 @@ function Homepage() {
     }
   };
 
+
+
   return (
     <div className="homepage-container">
       <NavBar />
@@ -201,6 +237,7 @@ function Homepage() {
                 task={task}
                 onClick={setSelectedTask}
                 currentUser={user}
+                onDeleteClick={setTaskToDelete}
               />
             ))}
           </div>
@@ -213,6 +250,16 @@ function Homepage() {
           users={users}
           onClose={() => setSelectedTask(null)}
           onSave={handleTaskUpdate}
+          onDelete={handleModalDelete}
+          currentUser={user}
+        />
+      )}
+
+      {taskToDelete && (
+        <DeleteConfirmationModal
+          taskTitle={taskToDelete.title}
+          onConfirm={handleDeleteConfirm}
+          onCancel={() => setTaskToDelete(null)}
         />
       )}
     </div>
