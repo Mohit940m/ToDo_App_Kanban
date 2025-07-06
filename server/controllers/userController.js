@@ -67,4 +67,15 @@ const loginUser = async (req, res) => {
     }
 };
 
-module.exports = {registerUser, loginUser};
+// Get all users (for task assignment)
+const getAllUsers = async (req, res) => {
+    try {
+        const users = await User.find({}, 'name email username').sort({ name: 1 });
+        res.json(users);
+    } catch (error) {
+        console.error("Get users error:", error.message);
+        res.status(500).json({ message: 'Server error' });
+    }
+};
+
+module.exports = {registerUser, loginUser, getAllUsers};

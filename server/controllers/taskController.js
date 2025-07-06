@@ -26,14 +26,18 @@ const createTask = async (req, res) => {
       title,
       description,
       assignedTo,
-      status,
-      priority,
+      status: status || "Todo",
+      priority: priority || "Medium",
       createdBy: req.user._id,
     });
 
     const saved = await newTask.save();
-    res.status(201).json(saved);
-    console.log("Task created:", saved);
+    const populatedTask = await Task.findById(saved._id)
+      .populate("createdBy", "name email")
+      .populate("assignedTo", "name email");
+    
+    res.status(201).json(populatedTask);
+    console.log("Task created:", populatedTask);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -48,17 +52,23 @@ const updateTask = async (req, res) => {
 
     if (!task) return res.status(404).json({ message: "Task not found" });
 
-    // Optional: Only allow the creator to update
-    if (task.createdBy.toString() !== req.user._id.toString()) {
-      return res.status(403).json({ message: "Not allowed to update this task" });
-    }
+    // Allow creator or assigned user to update the task
+    const isCreator = task.createdBy && task.createdBy.toString() === req.user._id.toString();
+    const isAssigned = task.assignedTo && task.assignedTo.toString() === req.user._id.toString();
+    
+    // For now, allow anyone to update tasks (you can uncomment the restriction below if needed)
+    // if (!isCreator && !isAssigned) {
+    //   return res.status(403).json({ message: "Not allowed to update this task" });
+    // }
 
-    const updated = await Task.findByIdAndUpdate(id, req.body, { new: true });
+    const updated = await Task.findByIdAndUpdate(id, req.body, { new: true })
+      .populate("createdBy", "name email")
+      .populate("assignedTo", "name email");
     res.status(200).json(updated);
     console.log("Task updated:", updated);
   } catch (error) {
     res.status(500).json({ message: error.message });
-    console.error("line. 59 Error updating task:", error);
+    console.error("Error updating task:", error);
   }
 };
 
@@ -71,7 +81,11 @@ const deleteTask = async (req, res) => {
 
     if (!task) return res.status(404).json({ message: "Task not found" });
 
-    if (task.createdBy.toString() !== req.user._id.toString()) {
+    // Allow creator or assigned user to delete the task
+    const isCreator = task.createdBy && task.createdBy.toString() === req.user._id.toString();
+    const isAssigned = task.assignedTo && task.assignedTo.toString() === req.user._id.toString();
+    
+    if (!isCreator && !isAssigned) {
       return res.status(403).json({ message: "Not allowed to delete this task" });
     }
 
@@ -80,7 +94,7 @@ const deleteTask = async (req, res) => {
     console.log("Task deleted:", id);
   } catch (error) {
     res.status(500).json({ message: error.message });
-    console.error("line. 77 Error deleting task:", error);
+    console.error("Error deleting task:", error);
   }
 };
 
