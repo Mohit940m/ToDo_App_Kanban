@@ -1,89 +1,116 @@
+/* Base styles */
 .homepage-container {
-  padding: 20px;
+  padding: 16px;
   max-width: 1200px;
   margin: auto;
+  min-height: 100vh;
 }
 
 .navbar {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   background: #333;
   color: white;
-  padding: 10px 20px;
+  padding: 12px 16px;
   border-radius: 8px;
   margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 10px;
 }
 
 .task-input {
-  margin-bottom: 30px;
+  margin-bottom: 24px;
   display: flex;
-  gap: 10px;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
 .task-input input {
   flex: 1;
-  padding: 12px;
-  border-radius: 6px;
+  min-width: 200px;
+  padding: 12px 16px;
+  border-radius: 8px;
   border: 1px solid #ddd;
-  font-size: 14px;
+  font-size: 16px; /* Prevents zoom on iOS */
+  background: white;
+  transition: all 0.2s ease;
 }
 
 .task-input input:focus {
   outline: none;
   border-color: #007bff;
-  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
 }
 
 .task-input button {
-  padding: 12px 24px;
+  padding: 12px 20px;
   background: #007bff;
   color: white;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: pointer;
   font-size: 14px;
-  font-weight: 500;
-  transition: background-color 0.2s;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  min-width: 100px;
 }
 
 .task-input button:hover {
   background: #0056b3;
+  transform: translateY(-1px);
 }
 
+.task-input button:active {
+  transform: translateY(0);
+}
+
+/* Kanban Board */
 .kanban-board {
   display: flex;
-  gap: 20px;
-  min-height: 500px;
+  gap: 16px;
+  min-height: 60vh;
+  overflow-x: auto;
+  padding-bottom: 20px;
 }
 
 .column {
   flex: 1;
+  min-width: 280px;
   background: #f8f9fa;
   padding: 16px;
-  border-radius: 8px;
+  border-radius: 12px;
   min-height: 400px;
   border: 2px dashed transparent;
   transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .column:hover {
   background: #f0f0f0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .column h3 {
   margin: 0 0 16px 0;
-  font-size: 16px;
-  font-weight: 600;
+  font-size: 18px;
+  font-weight: 700;
   color: #333;
   text-align: center;
-  padding-bottom: 8px;
-  border-bottom: 2px solid #e0e0e0;
+  padding: 12px 0;
+  border-bottom: 3px solid #e0e0e0;
+  border-radius: 4px 4px 0 0;
+  background: rgba(255, 255, 255, 0.7);
+  margin: -16px -16px 16px -16px;
+  padding: 16px;
 }
 
 /* Drag over effect */
 .column[data-drag-over="true"] {
   border-color: #007bff;
   background: #e3f2fd;
+  transform: scale(1.02);
 }
 
 .task-list {
@@ -92,8 +119,255 @@
 
 .task-card {
   background: white;
-  padding: 15px;
-  border-radius: 8px;
-  margin-bottom: 15px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  padding: 16px;
+  border-radius: 12px;
+  margin-bottom: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e0e0e0;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.task-card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+}
+
+.task-card:active {
+  transform: translateY(0);
+}
+
+/* Mobile Optimizations */
+@media (max-width: 768px) {
+  .homepage-container {
+    padding: 12px;
+  }
+
+  .navbar {
+    padding: 10px 12px;
+    flex-direction: column;
+    text-align: center;
+    gap: 8px;
+  }
+
+  .task-input {
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  .task-input input {
+    min-width: unset;
+    width: 100%;
+    font-size: 16px; /* Prevents zoom on iOS */
+    padding: 14px 16px;
+  }
+
+  .task-input button {
+    width: 100%;
+    padding: 14px 20px;
+    font-size: 16px;
+  }
+
+  .kanban-board {
+    flex-direction: column;
+    gap: 20px;
+    min-height: auto;
+    overflow-x: visible;
+  }
+
+  .column {
+    min-width: unset;
+    width: 100%;
+    min-height: 300px;
+    margin-bottom: 0;
+  }
+
+  .column h3 {
+    font-size: 16px;
+    padding: 12px;
+    margin: -16px -16px 12px -16px;
+  }
+
+  .task-card {
+    padding: 14px;
+    margin-bottom: 10px;
+  }
+
+  /* Improve touch targets */
+  .task-card {
+    min-height: 44px; /* iOS recommended touch target */
+  }
+}
+
+/* Small mobile devices */
+@media (max-width: 480px) {
+  .homepage-container {
+    padding: 8px;
+  }
+
+  .navbar {
+    padding: 8px 10px;
+    border-radius: 6px;
+    margin-bottom: 16px;
+  }
+
+  .task-input {
+    margin-bottom: 16px;
+  }
+
+  .task-input input,
+  .task-input button {
+    padding: 12px 14px;
+    border-radius: 6px;
+  }
+
+  .kanban-board {
+    gap: 16px;
+  }
+
+  .column {
+    padding: 12px;
+    border-radius: 8px;
+    min-height: 250px;
+  }
+
+  .column h3 {
+    font-size: 15px;
+    padding: 10px;
+    margin: -12px -12px 10px -12px;
+  }
+
+  .task-card {
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+  }
+}
+
+/* Landscape mobile */
+@media (max-width: 768px) and (orientation: landscape) {
+  .kanban-board {
+    flex-direction: row;
+    overflow-x: auto;
+    gap: 12px;
+  }
+
+  .column {
+    min-width: 250px;
+    flex-shrink: 0;
+  }
+}
+
+/* Tablet optimizations */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .homepage-container {
+    padding: 20px;
+  }
+
+  .kanban-board {
+    gap: 20px;
+  }
+
+  .column {
+    min-width: 220px;
+  }
+
+  .task-input {
+    max-width: 600px;
+    margin: 0 auto 30px auto;
+  }
+}
+
+/* Large screens */
+@media (min-width: 1200px) {
+  .homepage-container {
+    padding: 24px;
+  }
+
+  .kanban-board {
+    gap: 24px;
+  }
+
+  .column {
+    min-width: 300px;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .homepage-container {
+    background: #1a1a1a;
+    color: #ffffff;
+  }
+
+  .column {
+    background: #2d2d2d;
+    border-color: #404040;
+  }
+
+  .column h3 {
+    background: rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+    border-bottom-color: #404040;
+  }
+
+  .task-card {
+    background: #3a3a3a;
+    border-color: #505050;
+    color: #ffffff;
+  }
+
+  .task-input input {
+    background: #2d2d2d;
+    border-color: #505050;
+    color: #ffffff;
+  }
+
+  .task-input input:focus {
+    border-color: #007bff;
+  }
+}
+
+/* Accessibility improvements */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  .column {
+    border: 2px solid #000000;
+  }
+
+  .task-card {
+    border: 2px solid #000000;
+  }
+
+  .task-input button {
+    border: 2px solid #000000;
+  }
+}
+
+/* Focus styles for keyboard navigation */
+.task-card:focus,
+.task-input button:focus,
+.task-input input:focus {
+  outline: 3px solid #007bff;
+  outline-offset: 2px;
+}
+
+/* Loading states */
+.column.loading {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.task-card.dragging {
+  opacity: 0.5;
+  transform: rotate(5deg);
 }

@@ -1,17 +1,23 @@
 .task-card {
   background: white;
-  border-radius: 8px;
-  padding: 12px;
-  margin-bottom: 10px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   border: 1px solid #e0e0e0;
-  position: relative; /* Needed for absolute positioning of children */
+  position: relative;
   transition: all 0.2s ease;
+  min-height: 44px; /* iOS recommended touch target */
+  cursor: pointer;
 }
 
 .task-card:hover {
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+}
+
+.task-card:active {
+  transform: translateY(0);
 }
 
 .task-card[draggable="true"] {
@@ -26,20 +32,25 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
+  gap: 8px;
 }
 
 .title-text {
   font-weight: 600;
-  font-size: 14px;
+  font-size: 15px;
   color: #333;
+  line-height: 1.3;
+  word-break: break-word;
+  flex: 1;
 }
 
 .priority-dot {
-  width: 12px;
-  height: 12px;
+  width: 14px;
+  height: 14px;
   border-radius: 50%;
   flex-shrink: 0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
 .task-body {
@@ -47,44 +58,47 @@
 }
 
 .task-body p {
-  margin: 0 0 8px 0;
-  font-size: 13px;
+  margin: 0 0 10px 0;
+  font-size: 14px;
   line-height: 1.4;
+  word-break: break-word;
 }
 
 .task-body small {
-  font-size: 11px;
+  font-size: 12px;
   color: #888;
+  font-weight: 500;
 }
 
 .priority-low {
-  border-left: 5px solid green;
+  border-left: 4px solid #28a745;
 }
 
 .priority-medium {
-  border-left: 5px solid orange;
+  border-left: 4px solid #ffc107;
 }
 
 .priority-high {
-  border-left: 5px solid red;
+  border-left: 4px solid #dc3545;
 }
 
 .delete-task-btn {
   position: absolute;
-  bottom: 8px;
+  top: 8px;
   right: 8px;
-  background-color: rgba(255, 255, 255, 0.8);
+  background-color: rgba(255, 255, 255, 0.9);
   border: 1px solid #eee;
   border-radius: 50%;
-  width: 24px;
-  height: 24px;
+  width: 28px;
+  height: 28px;
   padding: 0;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  opacity: 0; /* Hidden by default, shown on card hover */
-  transition: opacity 0.2s ease, background-color 0.2s ease;
+  opacity: 0;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(4px);
 }
 
 .task-card:hover .delete-task-btn {
@@ -92,10 +106,197 @@
 }
 
 .delete-task-btn img {
-  width: 12px;
-  height: 12px;
+  width: 14px;
+  height: 14px;
 }
 
 .delete-task-btn:hover {
-  background-color: #ffebee; /* Light red */
+  background-color: #ffebee;
+  border-color: #dc3545;
+  transform: scale(1.1);
+}
+
+/* Mobile optimizations */
+@media (max-width: 768px) {
+  .task-card {
+    padding: 14px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    min-height: 48px; /* Larger touch target for mobile */
+  }
+
+  .task-titlebar {
+    margin-bottom: 8px;
+    gap: 6px;
+  }
+
+  .title-text {
+    font-size: 14px;
+    line-height: 1.2;
+  }
+
+  .priority-dot {
+    width: 12px;
+    height: 12px;
+  }
+
+  .task-body p {
+    font-size: 13px;
+    margin-bottom: 8px;
+  }
+
+  .task-body small {
+    font-size: 11px;
+  }
+
+  .delete-task-btn {
+    width: 32px;
+    height: 32px;
+    top: 6px;
+    right: 6px;
+    opacity: 0.7; /* More visible on mobile */
+  }
+
+  .delete-task-btn img {
+    width: 16px;
+    height: 16px;
+  }
+
+  /* Always show delete button on mobile for better UX */
+  .task-card .delete-task-btn {
+    opacity: 0.6;
+  }
+
+  .task-card:hover .delete-task-btn,
+  .task-card:active .delete-task-btn {
+    opacity: 1;
+  }
+}
+
+/* Small mobile devices */
+@media (max-width: 480px) {
+  .task-card {
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+  }
+
+  .title-text {
+    font-size: 13px;
+  }
+
+  .task-body p {
+    font-size: 12px;
+  }
+
+  .task-body small {
+    font-size: 10px;
+  }
+
+  .priority-dot {
+    width: 10px;
+    height: 10px;
+  }
+
+  .delete-task-btn {
+    width: 28px;
+    height: 28px;
+  }
+
+  .delete-task-btn img {
+    width: 14px;
+    height: 14px;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .task-card {
+    background: #2d2d2d;
+    border-color: #404040;
+    color: #ffffff;
+  }
+
+  .title-text {
+    color: #ffffff;
+  }
+
+  .task-body {
+    color: #cccccc;
+  }
+
+  .task-body small {
+    color: #999999;
+  }
+
+  .delete-task-btn {
+    background-color: rgba(45, 45, 45, 0.9);
+    border-color: #555555;
+  }
+
+  .delete-task-btn:hover {
+    background-color: rgba(220, 53, 69, 0.2);
+    border-color: #dc3545;
+  }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  .task-card {
+    border: 2px solid #000000;
+  }
+
+  .delete-task-btn {
+    border: 2px solid #000000;
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .task-card,
+  .delete-task-btn {
+    transition: none;
+  }
+
+  .task-card:hover {
+    transform: none;
+  }
+}
+
+/* Focus styles for accessibility */
+.task-card:focus {
+  outline: 3px solid #007bff;
+  outline-offset: 2px;
+}
+
+.delete-task-btn:focus {
+  outline: 2px solid #007bff;
+  outline-offset: 1px;
+}
+
+/* Dragging state */
+.task-card.dragging {
+  opacity: 0.6;
+  transform: rotate(2deg) scale(1.02);
+  z-index: 1000;
+}
+
+/* Loading state */
+.task-card.loading {
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.task-card.loading::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: inherit;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }

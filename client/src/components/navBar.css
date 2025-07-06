@@ -2,19 +2,220 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: #222;
+  background: linear-gradient(135deg, #2c3e50, #34495e);
   color: white;
-  padding: 10px 20px;
-  border-radius: 8px;
+  padding: 16px 20px;
+  border-radius: 12px;
   margin-bottom: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.navbar h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #ffffff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.navbar > div {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.navbar span {
+  font-size: 14px;
+  font-weight: 500;
+  color: #ecf0f1;
+  padding: 6px 12px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  backdrop-filter: blur(4px);
 }
 
 .navbar button {
-  margin-left: 15px;
-  padding: 8px 12px;
-  background: #ff4d4f;
+  padding: 10px 16px;
+  background: linear-gradient(135deg, #e74c3c, #c0392b);
   color: white;
   border: none;
-  border-radius: 5px;
+  border-radius: 8px;
   cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  min-height: 44px;
+  min-width: 80px;
+  box-shadow: 0 2px 6px rgba(231, 76, 60, 0.3);
+}
+
+.navbar button:hover {
+  background: linear-gradient(135deg, #c0392b, #a93226);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(231, 76, 60, 0.4);
+}
+
+.navbar button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(231, 76, 60, 0.3);
+}
+
+/* Mobile optimizations */
+@media (max-width: 768px) {
+  .navbar {
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin-bottom: 16px;
+    flex-direction: column;
+    text-align: center;
+    gap: 8px;
+  }
+
+  .navbar h2 {
+    font-size: 1.3rem;
+    margin-bottom: 4px;
+  }
+
+  .navbar > div {
+    width: 100%;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .navbar span {
+    font-size: 13px;
+    padding: 4px 10px;
+  }
+
+  .navbar button {
+    padding: 8px 14px;
+    font-size: 13px;
+    min-width: 70px;
+  }
+}
+
+/* Small mobile devices */
+@media (max-width: 480px) {
+  .navbar {
+    padding: 10px 12px;
+    border-radius: 6px;
+    margin-bottom: 12px;
+  }
+
+  .navbar h2 {
+    font-size: 1.2rem;
+  }
+
+  .navbar > div {
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .navbar span {
+    font-size: 12px;
+    padding: 3px 8px;
+  }
+
+  .navbar button {
+    padding: 6px 12px;
+    font-size: 12px;
+    width: 100%;
+    max-width: 120px;
+  }
+}
+
+/* Landscape mobile */
+@media (max-width: 768px) and (orientation: landscape) {
+  .navbar {
+    flex-direction: row;
+    padding: 8px 16px;
+  }
+
+  .navbar h2 {
+    font-size: 1.1rem;
+  }
+
+  .navbar > div {
+    width: auto;
+    flex-direction: row;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .navbar {
+    background: linear-gradient(135deg, #1a1a1a, #2d2d2d);
+    border: 1px solid #404040;
+  }
+
+  .navbar span {
+    background: rgba(255, 255, 255, 0.15);
+    color: #ffffff;
+  }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  .navbar {
+    background: #000000;
+    border: 2px solid #ffffff;
+  }
+
+  .navbar button {
+    background: #ff0000;
+    border: 2px solid #ffffff;
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .navbar button {
+    transition: none;
+  }
+
+  .navbar button:hover {
+    transform: none;
+  }
+}
+
+/* Focus styles for accessibility */
+.navbar button:focus {
+  outline: 3px solid #ffffff;
+  outline-offset: 2px;
+}
+
+/* Loading state */
+.navbar.loading {
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+/* User info styles */
+.navbar .user-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.navbar .user-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+@media (max-width: 480px) {
+  .navbar .user-avatar {
+    width: 28px;
+    height: 28px;
+    font-size: 12px;
+  }
 }

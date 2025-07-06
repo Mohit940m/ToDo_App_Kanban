@@ -10,12 +10,13 @@
   justify-content: center;
   z-index: 1000;
   backdrop-filter: blur(4px);
+  padding: 20px;
 }
 
 .modal-content {
   background: white;
   border-radius: 12px;
-  width: 90%;
+  width: 100%;
   max-width: 500px;
   max-height: 90vh;
   overflow-y: auto;
@@ -57,6 +58,7 @@
   font-weight: 600;
   font-size: 16px;
   color: #333;
+  word-break: break-word;
 }
 
 .task-preview-card .priority-dot {
@@ -75,6 +77,7 @@
   margin: 0 0 8px 0;
   font-size: 14px;
   line-height: 1.4;
+  word-break: break-word;
 }
 
 .task-preview-card .task-body small {
@@ -111,6 +114,8 @@
   align-items: center;
   justify-content: center;
   transition: all 0.2s ease;
+  min-height: 44px;
+  min-width: 44px;
 }
 
 .close-btn:hover {
@@ -145,6 +150,7 @@
   font-size: 14px;
   transition: border-color 0.2s ease;
   box-sizing: border-box;
+  min-height: 44px;
 }
 
 .form-group input:focus,
@@ -155,59 +161,9 @@
   box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
 }
 
-.form-group input:disabled,
-.form-group select:disabled,
-.form-group textarea:disabled {
-  cursor: not-allowed;
-  background-color: #f3f4f6;
-  opacity: 0.8;
-}
-
-.description-display.disabled:hover {
-  cursor: not-allowed;
-  border-color: #ddd;
-}
-
 .form-group textarea {
   resize: vertical;
   min-height: 80px;
-}
-
-/* Assign Group */
-.assign-group {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.assign-group select {
-  flex-grow: 1;
-}
-
-.smart-assign-btn {
-  padding: 12px 16px;
-  background-color: #8e44ad; /* Purple */
-  color: white;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: 600;
-  font-size: 14px;
-  transition: all 0.2s ease-in-out;
-  white-space: nowrap; /* Prevent button text from wrapping */
-}
-
-.smart-assign-btn:not(:disabled):hover,
-.smart-assign-btn:not(:disabled):active {
-  background-color: #9b59b6; /* Lighter Purple */
-  box-shadow: 0 0 15px rgba(142, 68, 173, 0.6);
-  transform: translateY(-1px);
-}
-
-.smart-assign-btn:disabled {
-  background-color: #ccc;
-  box-shadow: none;
-  transform: none;
 }
 
 /* Description Edit */
@@ -220,6 +176,7 @@
   transition: all 0.2s ease;
   position: relative;
   background: #fafafa;
+  min-height: 44px;
 }
 
 .description-display:hover {
@@ -232,6 +189,7 @@
   color: #666;
   font-size: 14px;
   line-height: 1.4;
+  word-break: break-word;
 }
 
 .description-display .edit-icon {
@@ -254,12 +212,13 @@
 
 .save-desc-btn,
 .cancel-desc-btn {
-  padding: 6px 12px;
+  padding: 8px 16px;
   border: none;
   border-radius: 4px;
   font-size: 12px;
   cursor: pointer;
   transition: background-color 0.2s ease;
+  min-height: 44px;
 }
 
 .save-desc-btn {
@@ -292,6 +251,8 @@
   justify-content: space-between;
   margin-bottom: 8px;
   font-size: 13px;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
 .metadata-item:last-child {
@@ -307,7 +268,7 @@
   color: #333;
   text-align: right;
   flex: 1;
-  margin-left: 12px;
+  word-break: break-word;
 }
 
 .task-id {
@@ -316,6 +277,7 @@
   background: #e9ecef;
   padding: 2px 6px;
   border-radius: 3px;
+  word-break: break-all;
 }
 
 /* Modal Actions */
@@ -337,6 +299,7 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
+  min-height: 44px;
 }
 
 .save-btn {
@@ -359,175 +322,278 @@
   transform: translateY(-1px);
 }
 
-/* Responsive Design */
-@media (max-width: 600px) {
-  .modal-content {
-    width: 95%;
-    margin: 20px;
-  }
-  
+/* Mobile Optimizations */
+@media (max-width: 768px) {
   .modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.6);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-  backdrop-filter: blur(3px);
-}
+    padding: 16px;
+    align-items: flex-start;
+    padding-top: 40px;
+  }
 
-.modal-content {
-  background: white;
-  padding: 20px 30px;
-  border-radius: 12px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-  width: 90%;
-  max-width: 600px;
-  max-height: 90vh;
-  overflow-y: auto;
-  border: 1px solid #ddd;
-}
+  .modal-content {
+    max-width: none;
+    margin: 0;
+    border-radius: 12px 12px 0 0;
+    max-height: calc(100vh - 40px);
+  }
 
-.modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-}
+  .task-preview-card {
+    margin: 16px 16px 0 16px;
+  }
 
-.modal-header h3 {
-  margin: 0;
-  font-size: 1.5rem;
-  color: #333;
-}
+  .modal-header {
+    padding: 16px 16px 0 16px;
+  }
 
-.close-btn {
-  background: none;
-  border: none;
-  font-size: 2rem;
-  cursor: pointer;
-  color: #888;
-  line-height: 1;
-}
+  .modal-header h3 {
+    font-size: 18px;
+  }
 
-.modal-form .form-group {
-  margin-bottom: 18px;
-}
+  .close-btn {
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+  }
 
-.form-group label {
-  display: block;
-  margin-bottom: 6px;
-  font-weight: bold;
-  color: #555;
-  font-size: 0.9rem;
-}
+  .modal-form {
+    padding: 16px;
+  }
 
-.form-group input[type="text"],
-.form-group select,
-.form-group textarea {
-  width: 100%;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  font-size: 1rem;
-}
+  .form-group {
+    margin-bottom: 16px;
+  }
 
-.description-display {
-  border: 1px dashed #ccc;
-  padding: 10px;
-  border-radius: 6px;
-  cursor: pointer;
-  min-height: 60px;
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-}
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    padding: 14px 12px;
+    font-size: 16px; /* Prevents zoom on iOS */
+  }
 
-.description-display p {
-  margin: 0;
-  color: #666;
-  white-space: pre-wrap;
-}
+  .description-display {
+    padding: 14px 12px;
+    font-size: 16px;
+  }
 
-.description-display .edit-icon {
-  opacity: 0.5;
-}
+  .description-actions {
+    flex-direction: column;
+    gap: 8px;
+  }
 
-.description-edit .description-actions {
-  margin-top: 8px;
-  display: flex;
-  gap: 8px;
-}
+  .save-desc-btn,
+  .cancel-desc-btn {
+    width: 100%;
+    padding: 12px 16px;
+    font-size: 14px;
+  }
 
-.task-metadata {
-  margin-top: 25px;
-  padding-top: 15px;
-  border-top: 1px solid #eee;
-  font-size: 0.8rem;
-  color: #777;
-}
+  .task-metadata {
+    padding: 12px 16px;
+  }
 
-.metadata-item {
-  margin-bottom: 5px;
-}
+  .metadata-item {
+    flex-direction: column;
+    gap: 4px;
+  }
 
-.metadata-label {
-  font-weight: bold;
-}
-
-.task-id {
-  font-family: monospace;
-  background-color: #f0f0f0;
-  padding: 2px 4px;
-  border-radius: 4px;
-}
+  .metadata-value {
+    text-align: left;
+  }
 
   .modal-actions {
+    padding: 16px;
     flex-direction: column;
+    gap: 8px;
   }
-  
+
   .save-btn,
   .cancel-btn {
     width: 100%;
+    padding: 14px 20px;
+    font-size: 16px;
   }
 }
-.modal-actions button {
-  padding: 10px 20px;
-  border-radius: 8px;
-  border: none;
-  cursor: pointer;
-  font-weight: bold;
-  font-size: 0.95rem;
-  transition: all 0.2s ease-in-out;
-  display: flex;
-  align-items: center;
-  gap: 8px;
+
+@media (max-width: 480px) {
+  .modal-overlay {
+    padding: 8px;
+    padding-top: 20px;
+  }
+
+  .modal-content {
+    border-radius: 8px;
+    max-height: calc(100vh - 20px);
+  }
+
+  .task-preview-card {
+    margin: 12px 12px 0 12px;
+  }
+
+  .task-preview-card .task-titlebar {
+    padding: 10px 12px;
+  }
+
+  .task-preview-card .title-text {
+    font-size: 14px;
+  }
+
+  .task-preview-card .task-body {
+    padding: 10px 12px;
+  }
+
+  .modal-header {
+    padding: 12px 12px 0 12px;
+  }
+
+  .modal-header h3 {
+    font-size: 16px;
+  }
+
+  .modal-form {
+    padding: 12px;
+  }
+
+  .form-group {
+    margin-bottom: 12px;
+  }
+
+  .task-metadata {
+    padding: 10px 12px;
+  }
+
+  .modal-actions {
+    padding: 12px;
+  }
 }
 
-.modal-actions .delete-btn {
-  background-color: #e53e3e; /* Red */
-  color: white;
-  margin-right: auto; /* Pushes this button to the far left */
+/* Full screen modal on very small devices */
+@media (max-width: 360px) {
+  .modal-overlay {
+    padding: 0;
+    align-items: stretch;
+  }
+
+  .modal-content {
+    width: 100%;
+    height: 100%;
+    max-height: 100vh;
+    border-radius: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .modal-form {
+    flex: 1;
+    overflow-y: auto;
+  }
 }
 
-.modal-actions .delete-btn:hover {
-  background-color: #c53030;
-  transform: translateY(-1px);
-}
-.modal-actions .save-btn:hover {
-  background-color: #1d4ed8;
-  transform: translateY(-1px);
-}
-.modal-actions .cancel-btn {
-  background-color: #f1f1f1;
-  color: #333;
-  border: 1px solid #e2e8f0;
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .modal-content {
+    background: #2d2d2d;
+    color: #ffffff;
+  }
+
+  .task-preview-card {
+    background: #3a3a3a;
+    border-color: #555555;
+  }
+
+  .task-preview-card .task-titlebar {
+    background: #404040;
+    border-bottom-color: #555555;
+  }
+
+  .task-preview-card .title-text {
+    color: #ffffff;
+  }
+
+  .task-preview-card .task-body {
+    color: #cccccc;
+  }
+
+  .modal-header h3 {
+    color: #ffffff;
+  }
+
+  .close-btn {
+    color: #cccccc;
+  }
+
+  .close-btn:hover {
+    background: #404040;
+    color: #ffffff;
+  }
+
+  .form-group label {
+    color: #ffffff;
+  }
+
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    background: #404040;
+    border-color: #555555;
+    color: #ffffff;
+  }
+
+  .description-display {
+    background: #404040;
+    border-color: #555555;
+  }
+
+  .description-display p {
+    color: #cccccc;
+  }
+
+  .task-metadata {
+    background: #404040;
+    border-top-color: #555555;
+  }
+
+  .modal-actions {
+    background: #404040;
+    border-top-color: #555555;
+  }
 }
 
-.modal-actions .cancel-btn:hover {
-  background-color: #e0e0e0;
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  .modal-content {
+    border: 2px solid #000000;
+  }
+
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    border: 2px solid #000000;
+  }
+
+  .save-btn,
+  .cancel-btn {
+    border: 2px solid #000000;
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .modal-content {
+    animation: none;
+  }
+
+  .save-btn:hover,
+  .cancel-btn:hover {
+    transform: none;
+  }
+}
+
+/* Focus styles for accessibility */
+.close-btn:focus,
+.save-btn:focus,
+.cancel-btn:focus,
+.save-desc-btn:focus,
+.cancel-desc-btn:focus {
+  outline: 3px solid #007bff;
+  outline-offset: 2px;
 }
