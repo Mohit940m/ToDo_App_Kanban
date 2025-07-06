@@ -2,6 +2,7 @@ const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const generateToken = require('../utils/jwtHelper');
+const Task = require("../models/Task");
 
 // Register a new user
 const registerUser = async (req, res) => {
@@ -78,4 +79,28 @@ const getAllUsers = async (req, res) => {
     }
 };
 
-module.exports = {registerUser, loginUser, getAllUsers};
+const getLeastBusyUser = async (req, res) => {
+  try {
+    const users = await User.find({}, "_id name");
+
+    // Get task counts per user
+    const taskCounts = await Promise.all(
+      users.map(async (user) => {
+        const count = await Task.countDocuments({
+          assignedTo: user._id,
+          status: { $ne: "Done" },
+        });
+        return { user, count };
+      })
+    );
+
+    // Sort by fewest active tasks
+    taskCounts.sort((a, b) => a.count - b.count);
+
+    res.json(taskCounts[0].user); // return the least busy user
+  } catch (err) {
+    res.status(500).json({ message: "Failed to calculate workload" });
+  }
+};
+
+module.exports = {registerUser, loginUser, getAllUsers, getLeastBusyUser};
