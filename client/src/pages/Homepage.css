@@ -1,36 +1,35 @@
 /* Base styles */
 .homepage-container {
   padding: 16px;
-  max-width: 1200px;
-  margin: auto;
   min-height: 100vh;
+  overflow-x: hidden; /* Prevent horizontal scroll */
+  width: 100%;
+  box-sizing: border-box;
 }
 
-/* Adjust main content for desktop activity log */
-@media (min-width: 768px) {
+/* Adjust main content for desktop activity log - More specific media query */
+@media (min-width: 769px) {
   .homepage-container {
     margin-right: 370px; /* Account for 350px activity log + 20px margin */
+    padding-right: 20px; /* Add some spacing from the activity log */
+    width: calc(100% - 370px); /* Use full available width minus activity log */
+    max-width: none; /* Remove max-width restriction */
   }
 }
 
-.navbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: #333;
-  color: white;
-  padding: 12px 16px;
-  border-radius: 8px;
-  margin-bottom: 20px;
-  flex-wrap: wrap;
-  gap: 10px;
-}
 
 .task-input {
   margin-bottom: 24px;
   display: flex;
-  gap: 8px;
+  gap: 12px;
   flex-wrap: wrap;
+  align-items: stretch;
+}
+
+.button-group {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
 }
 
 .task-input input {
@@ -50,9 +49,10 @@
   box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
 }
 
-.task-input button {
+/* Quick Add Button */
+.quick-add-btn {
   padding: 12px 20px;
-  background: #007bff;
+  background: linear-gradient(135deg, #17a2b8, #20c997);
   color: white;
   border: none;
   border-radius: 8px;
@@ -61,15 +61,43 @@
   font-weight: 600;
   transition: all 0.2s ease;
   white-space: nowrap;
-  min-width: 100px;
+  min-width: 120px;
+  box-shadow: 0 2px 8px rgba(23, 162, 184, 0.3);
 }
 
-.task-input button:hover {
-  background: #0056b3;
+.quick-add-btn:hover {
+  background: linear-gradient(135deg, #138496, #1ea085);
   transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(23, 162, 184, 0.4);
 }
 
-.task-input button:active {
+.quick-add-btn:active {
+  transform: translateY(0);
+}
+
+/* Full Add Task Button */
+.full-add-btn {
+  padding: 12px 20px;
+  background: linear-gradient(135deg, #28a745, #20c997);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  min-width: 120px;
+  box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);
+}
+
+.full-add-btn:hover {
+  background: linear-gradient(135deg, #218838, #1ea085);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4);
+}
+
+.full-add-btn:active {
   transform: translateY(0);
 }
 
@@ -80,6 +108,7 @@
   min-height: 60vh;
   overflow-x: auto;
   padding-bottom: 20px;
+  width: 100%;
 }
 
 .column {
@@ -92,6 +121,21 @@
   border: 2px dashed transparent;
   transition: all 0.2s ease;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Desktop specific column adjustments */
+@media (min-width: 769px) {
+  .kanban-board {
+    display: flex;
+    width: 100%;
+    overflow-x: visible; /* No horizontal scroll needed on desktop */
+  }
+  
+  .column {
+    min-width: 250px; /* Smaller min-width to fit better */
+    max-width: none; /* Allow columns to grow */
+    flex: 1;
+  }
 }
 
 .column:hover {
@@ -149,15 +193,12 @@
   .homepage-container {
     padding: 12px;
     padding-bottom: 80px; /* Account for mobile activity log toggle */
+    margin-right: 0; /* Reset any desktop margin */
+    max-width: 100%; /* Ensure full width on mobile */
+    overflow-x: hidden; /* Extra protection against horizontal scroll */
   }
 
-  .navbar {
-    padding: 10px 12px;
-    flex-direction: column;
-    text-align: center;
-    gap: 8px;
-  }
-
+  
   .task-input {
     flex-direction: column;
     gap: 12px;
@@ -171,10 +212,18 @@
     padding: 14px 16px;
   }
 
-  .task-input button {
+  .button-group {
+    width: 100%;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .quick-add-btn,
+  .full-add-btn {
     width: 100%;
     padding: 14px 20px;
     font-size: 16px;
+    min-width: unset;
   }
 
   .kanban-board {
@@ -214,12 +263,7 @@
     padding: 8px;
   }
 
-  .navbar {
-    padding: 8px 10px;
-    border-radius: 6px;
-    margin-bottom: 16px;
-  }
-
+  
   .task-input {
     margin-bottom: 16px;
   }
@@ -271,19 +315,15 @@
 @media (min-width: 769px) and (max-width: 1024px) {
   .homepage-container {
     padding: 20px;
+    padding-right: 20px;
   }
 
   .kanban-board {
-    gap: 20px;
+    gap: 18px;
   }
 
   .column {
     min-width: 220px;
-  }
-
-  .task-input {
-    max-width: 600px;
-    margin: 0 auto 30px auto;
   }
 }
 
@@ -291,6 +331,7 @@
 @media (min-width: 1200px) {
   .homepage-container {
     padding: 24px;
+    padding-right: 24px;
   }
 
   .kanban-board {
@@ -298,7 +339,7 @@
   }
 
   .column {
-    min-width: 300px;
+    min-width: 280px;
   }
 }
 
@@ -363,7 +404,8 @@
 
 /* Focus styles for keyboard navigation */
 .task-card:focus,
-.task-input button:focus,
+.quick-add-btn:focus,
+.full-add-btn:focus,
 .task-input input:focus {
   outline: 3px solid #007bff;
   outline-offset: 2px;

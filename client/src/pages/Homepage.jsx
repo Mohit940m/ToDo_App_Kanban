@@ -1,12 +1,14 @@
 import React from "react";
 import { useState, useEffect } from "react";
 import API from "../api/api"; // Adjust the path as necessary
+import { useMediaQuery } from 'react-responsive';
 import NavBar from "../components/navBar"; // Ensure the path is correct
 import "./Homepage.css"; // optional if you want to add styles
 import { toast } from "react-toastify";
 import { io } from "socket.io-client";
 import TaskCard from "../components/TaskCard"; // Ensure the path is correct
 import TaskModal from "../components/TaskModal";
+import TaskCreationModal from "../components/TaskCreationModal";
 import DeleteConfirmationModal from "../components/DeleteConfirmationModal";
 import ConflictResolutionModal from "../components/ConflictResolutionModal";
 import ActivityLogContainer from '../components/ActivityLog/ActivityLogContainer';
@@ -15,6 +17,10 @@ import ActivityLogContainer from '../components/ActivityLog/ActivityLogContainer
 const socket = io(import.meta.env.VITE_API_URL);
 
 function Homepage() {
+  // State to manage desktop activity log visibility
+  const [isActivityLogVisible, setIsActivityLogVisible] = useState(true);
+  const isDesktop = useMediaQuery({ query: '(min-width: 769px)' });
+
   const user = JSON.parse(localStorage.getItem("user"));
   const [tasks, setTasks] = useState([]);
   const [newTitle, setNewTitle] = useState("");
@@ -23,6 +29,7 @@ function Homepage() {
   const [users, setUsers] = useState([]); // Populate from API
   const [taskToDelete, setTaskToDelete] = useState(null);
   const [conflict, setConflict] = useState(null);
+  const [showTaskCreationModal, setShowTaskCreationModal] = useState(false);
 
   // Fetch users
   const getUsers = async () => {
@@ -44,8 +51,8 @@ function Homepage() {
     }
   };
 
-  // Create task
-  const addTask = async () => {
+  // Quick add task (from input field)
+  const quickAddTask = async () => {
     try {
       if (!newTitle.trim()) return;
 
@@ -64,6 +71,23 @@ function Homepage() {
     } catch (error) {
       console.error("Error adding task", error.message);
       toast.error("Failed to add task. Please try again.");
+    }
+  };
+
+  // Create task from modal
+  const createTask = async (taskData) => {
+    try {
+      const res = await API.post("/api/tasks", taskData);
+
+      setTasks((prev) => [...prev, res.data]);
+      // 🔊 Emit socket event for other users
+      socket.emit("task-added", res.data);
+
+      toast.success("Task created successfully!");
+    } catch (error) {
+      console.error("Error creating task", error.message);
+      toast.error("Failed to create task. Please try again.");
+      throw error;
     }
   };
 
@@ -245,21 +269,38 @@ function Homepage() {
     }
   };
 
-
+  // Dynamic style for the homepage container to adjust for the activity log
+  const homepageContainerStyle = {
+    transition: 'all 0.4s ease-in-out',
+    // On desktop, add a margin to make space for the activity log only if it's visible
+    width: isDesktop && isActivityLogVisible ? 'calc(100% - 370px)' : '100%',
+    marginRight: isDesktop && isActivityLogVisible ? '370px' : '0px',
+    paddingRight: isDesktop && isActivityLogVisible ? '20px' : '0px',
+  };
 
   return (
-    <div className="homepage-container">
+    <div className="homepage-container" style={homepageContainerStyle}>
       <NavBar />
 
       <div className="task-input">
         <input
           type="text"
-          placeholder="Enter task title"
+          placeholder="Quick add task..."
           value={newTitle}
           onChange={(e) => setNewTitle(e.target.value)}
-          onKeyPress={(e) => e.key === 'Enter' && addTask()}
+          onKeyPress={(e) => e.key === 'Enter' && quickAddTask()}
         />
-        <button onClick={addTask}>Add Task</button>
+        <div className="button-group">
+          <button onClick={quickAddTask} className="quick-add-btn">
+            ⚡ Quick Add
+          </button>
+          <button 
+            onClick={() => setShowTaskCreationModal(true)} 
+            className="full-add-btn"
+          >
+            ✨ Add Task
+          </button>
+        </div>
       </div>
 
       <div className="kanban-board">
@@ -295,6 +336,15 @@ function Homepage() {
         />
       )}
 
+      {showTaskCreationModal && (
+        <TaskCreationModal
+          users={users}
+          onClose={() => setShowTaskCreationModal(false)}
+          onSave={createTask}
+          currentUser={user}
+        />
+      )}
+
       {taskToDelete && (
         <DeleteConfirmationModal
           taskTitle={taskToDelete.title}
@@ -313,7 +363,10 @@ function Homepage() {
       )}
 
       {/* Activity Log - Responsive placement handled internally */}
-      <ActivityLogContainer />
+      <ActivityLogContainer
+        isDesktopVisible={isActivityLogVisible}
+        onToggleDesktopVisibility={() => setIsActivityLogVisible(prev => !prev)}
+      />
     </div>
   );
 }

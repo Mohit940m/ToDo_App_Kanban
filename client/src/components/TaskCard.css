@@ -84,7 +84,7 @@
 
 .delete-task-btn {
   position: absolute;
-  top: 8px;
+  bottom: 8px;
   right: 8px;
   background-color: rgba(255, 255, 255, 0.9);
   border: 1px solid #eee;
@@ -152,7 +152,7 @@
   .delete-task-btn {
     width: 32px;
     height: 32px;
-    top: 6px;
+    bottom: 6px;
     right: 6px;
     opacity: 0.7; /* More visible on mobile */
   }

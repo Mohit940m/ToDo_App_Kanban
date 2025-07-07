@@ -1,42 +1,46 @@
 // client/src/components/ActivityLog/ActivityLogContainer.jsx
 import React from 'react';
+import { useMediaQuery } from 'react-responsive';
 import { useActivityLog } from '../../hooks/useActivityLog';
-import useMediaQuery from '../../hooks/useMediaQuery';
 import ActivityLogDesktop from './ActivityLogDesktop';
 import ActivityLogMobile from './ActivityLogMobile';
+import './ActivityLog.css'; // For loading/error styles
 
-// Get the current user's ID from localStorage
-const getCurrentUserId = () => {
-  const user = JSON.parse(localStorage.getItem("user"));
-  return user?._id || user?.id;
-};
+// Accept the new props from Homepage.jsx
+const ActivityLogContainer = ({ isDesktopVisible, onToggleDesktopVisibility }) => {
+  const { logs, newActivityIds, loading, error, currentUserId } = useActivityLog();
+  const isDesktop = useMediaQuery({ query: '(min-width: 769px)' });
 
-const ActivityLogContainer = () => {
-  const { logs, loading, error, newActivityIds } = useActivityLog();
-  const isDesktop = useMediaQuery('(min-width: 768px)');
-  const currentUserId = getCurrentUserId();
-
-  if (loading) {
-    return (
-      <div className="activity-log-loading">
-        <div className="loading-spinner">Loading activity...</div>
-      </div>
-    );
+  if (loading && isDesktop) {
+    return <div className="activity-log-loading"><div className="loading-spinner">Loading Activity...</div></div>;
   }
 
-  if (error) {
-    return (
-      <div className="activity-log-error">
-        <div>Error: {error}</div>
-      </div>
-    );
+  if (error && isDesktop) {
+    return <div className="activity-log-error"><div>{error}</div></div>;
   }
 
   if (isDesktop) {
-    return <ActivityLogDesktop logs={logs} currentUserId={currentUserId} newActivityIds={newActivityIds} />;
+    // Pass the props down to the desktop component
+    return (
+      <ActivityLogDesktop 
+        isVisible={isDesktopVisible} 
+        onToggleVisibility={onToggleDesktopVisibility}
+        logs={logs}
+        currentUserId={currentUserId}
+        newActivityIds={newActivityIds}
+      />
+    );
   }
-
-  return <ActivityLogMobile logs={logs} currentUserId={currentUserId} newActivityIds={newActivityIds} />;
+  
+  // For mobile, loading/error states can be handled inside the component if needed
+  return (
+    <ActivityLogMobile 
+      logs={logs}
+      currentUserId={currentUserId}
+      newActivityIds={newActivityIds}
+      isLoading={loading}
+    />
+  );
 };
 
 export default ActivityLogContainer;

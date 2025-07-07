@@ -412,6 +412,17 @@
     padding: 14px 20px;
     font-size: 16px;
   }
+
+  .assign-group {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .assign-group .smart-assign-btn {
+    width: 100%;
+    padding: 14px 16px;
+    font-size: 16px;
+  }
 }
 
 @media (max-width: 480px) {
@@ -588,12 +599,82 @@
   }
 }
 
+/* Smart assign button styling */
+.smart-assign-btn {
+  background: linear-gradient(135deg, #8b5cf6, #a855f7);
+  color: white;
+  border: none;
+  padding: 12px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-height: 44px;
+  box-shadow: 0 2px 8px rgba(139, 92, 246, 0.3);
+  white-space: nowrap;
+}
+
+.smart-assign-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #7c3aed, #9333ea);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(139, 92, 246, 0.5);
+  filter: brightness(1.1);
+}
+
+.smart-assign-btn:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(139, 92, 246, 0.6);
+}
+
+.smart-assign-btn:disabled {
+  background: #6c757d;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+  filter: none;
+}
+
+/* Assign group layout */
+.assign-group {
+  display: flex;
+  gap: 12px;
+  align-items: stretch;
+}
+
+.assign-group select {
+  flex: 1;
+}
+
+.assign-group .smart-assign-btn {
+  flex-shrink: 0;
+}
+
+/* Animation for smart assign button */
+@keyframes smartAssignGlow {
+  0% {
+    box-shadow: 0 2px 8px rgba(139, 92, 246, 0.3);
+  }
+  50% {
+    box-shadow: 0 4px 16px rgba(139, 92, 246, 0.6), 0 0 0 4px rgba(139, 92, 246, 0.1);
+  }
+  100% {
+    box-shadow: 0 2px 8px rgba(139, 92, 246, 0.3);
+  }
+}
+
+.smart-assign-btn:focus {
+  animation: smartAssignGlow 1.5s ease-in-out;
+  outline: none;
+}
+
 /* Focus styles for accessibility */
 .close-btn:focus,
 .save-btn:focus,
 .cancel-btn:focus,
 .save-desc-btn:focus,
-.cancel-desc-btn:focus {
+.cancel-desc-btn:focus,
+.smart-assign-btn:focus {
   outline: 3px solid #007bff;
   outline-offset: 2px;
 }

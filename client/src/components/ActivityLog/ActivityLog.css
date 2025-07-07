@@ -15,13 +15,41 @@
   box-shadow: -2px 0 8px rgba(0, 0, 0, 0.08);
 }
 
-.activity-log-desktop h3 {
-  margin: 0 0 1.5rem 0;
+.activity-log-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  border-bottom: 2px solid #e5e7eb;
+  padding-bottom: 0.75rem;
+}
+
+.activity-log-header h3 {
+  margin: 0;
   font-size: 1.25rem;
   font-weight: 700;
   color: #1f2937;
-  border-bottom: 2px solid #e5e7eb;
-  padding-bottom: 0.75rem;
+}
+
+.minimize-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease;
+}
+
+.minimize-btn:hover {
+  background-color: #f3f4f6;
+}
+
+.minimize-btn img {
+  width: 20px;
+  height: 20px;
 }
 
 .activity-log-desktop .log-container {
@@ -36,6 +64,8 @@
   bottom: 0;
   left: 0;
   right: 0;
+  width: 100%;
+  max-width: 100vw;
   background-color: #ffffff;
   border-top: 1px solid #e5e7eb;
   transition: transform 0.3s ease-in-out;
@@ -43,6 +73,7 @@
   z-index: 1000;
   box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.15);
   max-height: 60vh;
+  box-sizing: border-box;
 }
 
 .activity-log-mobile.open {
@@ -217,6 +248,11 @@
   transform: scale(0.95);
 }
 
+.activity-log-floating-toggle:focus {
+  outline: 3px solid #3b82f6;
+  outline-offset: 2px;
+}
+
 .activity-log-floating-toggle.has-new {
   animation: pulse 2s infinite;
 }
@@ -259,10 +295,25 @@
   }
 }
 
-@media (min-width: 768px) {
-  .activity-log-mobile,
-  .activity-log-floating-toggle {
+@media (min-width: 769px) {
+  .activity-log-mobile {
     display: none;
+  }
+
+  /* Position the toggle button to the bottom-right on desktop */
+  .activity-log-floating-toggle {
+    top: auto; /* Reset vertical alignment */
+    bottom: 20px; /* Position from the bottom */
+    right: 20px; /* Position from the right */
+    transform: none; /* Remove the vertical translation */
+  }
+
+  .activity-log-floating-toggle:hover {
+    transform: scale(1.1); /* Keep the hover scale effect */
+  }
+
+  .activity-log-floating-toggle:active {
+    transform: scale(0.95); /* Keep the active scale effect */
   }
 }
 
