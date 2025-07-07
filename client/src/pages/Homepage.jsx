@@ -9,6 +9,7 @@ import TaskCard from "../components/TaskCard"; // Ensure the path is correct
 import TaskModal from "../components/TaskModal";
 import DeleteConfirmationModal from "../components/DeleteConfirmationModal";
 import ConflictResolutionModal from "../components/ConflictResolutionModal";
+import ActivityLogContainer from '../components/ActivityLog/ActivityLogContainer';
 
 
 const socket = io(import.meta.env.VITE_API_URL);
@@ -310,6 +311,9 @@ function Homepage() {
           onDiscard={handleDiscard}
         />
       )}
+
+      {/* Activity Log - Responsive placement handled internally */}
+      <ActivityLogContainer />
     </div>
   );
 }

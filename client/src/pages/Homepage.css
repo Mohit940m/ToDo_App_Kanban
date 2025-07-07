@@ -6,6 +6,13 @@
   min-height: 100vh;
 }
 
+/* Adjust main content for desktop activity log */
+@media (min-width: 768px) {
+  .homepage-container {
+    margin-right: 370px; /* Account for 350px activity log + 20px margin */
+  }
+}
+
 .navbar {
   display: flex;
   justify-content: space-between;
@@ -141,6 +148,7 @@
 @media (max-width: 768px) {
   .homepage-container {
     padding: 12px;
+    padding-bottom: 80px; /* Account for mobile activity log toggle */
   }
 
   .navbar {

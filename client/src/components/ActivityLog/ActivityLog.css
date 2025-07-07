@@ -1,0 +1,350 @@
+/* client/src/components/ActivityLog/ActivityLog.css */
+
+/* Desktop Activity Log - Right Side Panel */
+.activity-log-desktop {
+  position: fixed;
+  top: 60px; /* Adjust based on your header height */
+  right: 0;
+  width: 350px;
+  height: calc(100vh - 60px);
+  background-color: #ffffff;
+  border-left: 1px solid #e5e7eb;
+  padding: 1.5rem;
+  overflow-y: auto;
+  z-index: 100;
+  box-shadow: -2px 0 8px rgba(0, 0, 0, 0.08);
+}
+
+.activity-log-desktop h3 {
+  margin: 0 0 1.5rem 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1f2937;
+  border-bottom: 2px solid #e5e7eb;
+  padding-bottom: 0.75rem;
+}
+
+.activity-log-desktop .log-container {
+  height: calc(100% - 60px);
+  overflow-y: auto;
+  padding-right: 0.5rem;
+}
+
+/* Mobile Activity Log - Bottom Panel */
+.activity-log-mobile {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: #ffffff;
+  border-top: 1px solid #e5e7eb;
+  transition: transform 0.3s ease-in-out;
+  transform: translateY(100%);
+  z-index: 1000;
+  box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.15);
+  max-height: 60vh;
+}
+
+.activity-log-mobile.open {
+  transform: translateY(0);
+}
+
+.activity-log-toggle {
+  padding: 1rem;
+  text-align: center;
+  font-weight: 600;
+  cursor: pointer;
+  background-color: #f8fafc;
+  border-bottom: 1px solid #e5e7eb;
+  color: #374151;
+  transition: background-color 0.2s ease;
+}
+
+.activity-log-toggle:hover {
+  background-color: #f1f5f9;
+}
+
+.activity-log-toggle:active {
+  background-color: #e2e8f0;
+}
+
+.activity-log-content {
+  padding: 1rem;
+  overflow-y: auto;
+  max-height: calc(60vh - 60px); /* Adjust based on toggle button height */
+}
+
+.activity-log-content h3 {
+  margin: 0 0 1rem 0;
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.log-item {
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #f3f4f6;
+  font-size: 0.9rem;
+  transition: background-color 0.2s ease;
+}
+
+.log-item:hover {
+  background-color: #f9fafb;
+  border-radius: 6px;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+}
+
+.log-item.highlight {
+  background-color: #eff6ff;
+  border-left: 3px solid #3b82f6;
+  padding-left: 0.75rem;
+  border-radius: 0 6px 6px 0;
+}
+
+.log-item.new-activity {
+  animation: newActivityPulse 2s ease-in-out;
+  background-color: #f0fdf4;
+  border-left: 3px solid #22c55e;
+}
+
+@keyframes newActivityPulse {
+  0% {
+    background-color: #dcfce7;
+    transform: scale(1.02);
+  }
+  50% {
+    background-color: #bbf7d0;
+  }
+  100% {
+    background-color: #f0fdf4;
+    transform: scale(1);
+  }
+}
+
+.log-item p {
+  margin: 0 0 0.5rem 0;
+  color: #374151;
+  line-height: 1.5;
+}
+
+.log-item .meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin-top: 0.25rem;
+}
+
+.log-item .user-name {
+  font-weight: 500;
+  color: #4b5563;
+}
+
+.log-item .timestamp {
+  color: #9ca3af;
+}
+
+/* No logs state */
+.no-logs {
+  text-align: center;
+  padding: 2rem 1rem;
+  color: #6b7280;
+}
+
+.no-logs p {
+  margin: 0;
+  font-style: italic;
+}
+
+/* Loading and Error states */
+.activity-log-loading,
+.activity-log-error {
+  position: fixed;
+  top: 60px;
+  right: 0;
+  width: 350px;
+  height: calc(100vh - 60px);
+  background-color: #ffffff;
+  border-left: 1px solid #e5e7eb;
+  padding: 1.5rem;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.loading-spinner {
+  color: #6b7280;
+  font-size: 0.9rem;
+}
+
+.activity-log-error div {
+  color: #dc2626;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+/* Floating toggle button for mobile */
+.activity-log-floating-toggle {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #3b82f6;
+  color: white;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+  z-index: 1001;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.activity-log-floating-toggle:hover {
+  background: #2563eb;
+  transform: scale(1.1);
+  box-shadow: 0 6px 16px rgba(59, 130, 246, 0.5);
+}
+
+.activity-log-floating-toggle:active {
+  transform: scale(0.95);
+}
+
+.activity-log-floating-toggle.has-new {
+  animation: pulse 2s infinite;
+}
+
+.notification-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background: #ef4444;
+  color: white;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  font-size: 12px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid white;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+  }
+  50% {
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.8), 0 0 0 10px rgba(59, 130, 246, 0.1);
+  }
+  100% {
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 767px) {
+  .activity-log-desktop,
+  .activity-log-loading,
+  .activity-log-error {
+    display: none;
+  }
+}
+
+@media (min-width: 768px) {
+  .activity-log-mobile,
+  .activity-log-floating-toggle {
+    display: none;
+  }
+}
+
+/* Scrollbar styling for desktop */
+.activity-log-desktop .log-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.activity-log-desktop .log-container::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 3px;
+}
+
+.activity-log-desktop .log-container::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+.activity-log-desktop .log-container::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Mobile scrollbar styling */
+.activity-log-content::-webkit-scrollbar {
+  width: 4px;
+}
+
+.activity-log-content::-webkit-scrollbar-track {
+  background: #f8fafc;
+}
+
+.activity-log-content::-webkit-scrollbar-thumb {
+  background: #e2e8f0;
+  border-radius: 2px;
+}
+
+.activity-log-content::-webkit-scrollbar-thumb:hover {
+  background: #cbd5e1;
+}
+
+/* Animation for mobile panel */
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(100%);
+  }
+}
+
+/* Accessibility improvements */
+@media (prefers-reduced-motion: reduce) {
+  .activity-log-mobile,
+  .activity-log-floating-toggle {
+    transition: none;
+  }
+}
+
+/* Focus styles for keyboard navigation */
+.activity-log-floating-toggle:focus,
+.activity-log-toggle:focus {
+  outline: 3px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .activity-log-desktop,
+  .activity-log-mobile {
+    border: 2px solid #000000;
+  }
+  
+  .log-item {
+    border-bottom: 2px solid #000000;
+  }
+}

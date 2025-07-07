@@ -1,4 +1,5 @@
 const Task = require("../models/Task");
+const logAction = require("../utils/logAction");
 
 // GET all tasks for the logged-in user (can filter later by status)
 const getTasks = async (req, res) => {
@@ -35,7 +36,13 @@ const createTask = async (req, res) => {
     const populatedTask = await Task.findById(saved._id)
       .populate("createdBy", "name email")
       .populate("assignedTo", "name email");
-    
+
+    await logAction({
+      userId: req.user._id,
+      actionType: "create",
+      taskId: newTask._id,
+      description: `Created task "${newTask.title}"`,
+    }, global.io);
     res.status(201).json(populatedTask);
     console.log("Task created:", populatedTask);
   } catch (error) {
@@ -56,7 +63,7 @@ const updateTask = async (req, res) => {
     // Allow creator or assigned user to update the task
     const isCreator = taskOnServer.createdBy && taskOnServer.createdBy.toString() === req.user._id.toString();
     const isAssigned = taskOnServer.assignedTo && taskOnServer.assignedTo.toString() === req.user._id.toString();
-    
+
     if (!isCreator && !isAssigned) {
       return res.status(403).json({ message: "Not allowed to update this task" });
     }
@@ -82,6 +89,29 @@ const updateTask = async (req, res) => {
     const updated = await Task.findByIdAndUpdate(id, updatePayload, { new: true })
       .populate("createdBy", "name email")
       .populate("assignedTo", "name email");
+
+    // Log different types of updates
+    let actionType = "edit";
+    let description = `Updated task "${updated.title}"`;
+
+    // Check if status was changed (task moved)
+    if (updatePayload.status && taskOnServer.status !== updatePayload.status) {
+      actionType = "move";
+      description = `Moved task "${updated.title}" from ${taskOnServer.status} to ${updatePayload.status}`;
+    }
+    // Check if assignedTo was changed
+    else if (updatePayload.assignedTo && taskOnServer.assignedTo?.toString() !== updatePayload.assignedTo) {
+      actionType = "assign";
+      description = `Assigned task "${updated.title}" to ${updated.assignedTo?.name || 'someone'}`;
+    }
+
+    await logAction({
+      userId: req.user._id,
+      actionType,
+      taskId: updated._id,
+      description,
+    }, global.io);
+
     res.status(200).json(updated);
     console.log("Task updated:", updated);
   } catch (error) {
@@ -102,10 +132,18 @@ const deleteTask = async (req, res) => {
     // Allow creator or assigned user to delete the task
     const isCreator = task.createdBy && task.createdBy.toString() === req.user._id.toString();
     const isAssigned = task.assignedTo && task.assignedTo.toString() === req.user._id.toString();
-    
+
     if (!isCreator && !isAssigned) {
       return res.status(403).json({ message: "Not allowed to delete this task" });
     }
+
+    // Log the delete action before deleting the task
+    await logAction({
+      userId: req.user._id,
+      actionType: "delete",
+      taskId: task._id,
+      description: `Deleted task "${task.title}"`,
+    }, global.io);
 
     await task.deleteOne();
     res.status(200).json({ message: "Task deleted" });

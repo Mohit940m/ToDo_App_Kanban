@@ -4,6 +4,7 @@ const dotenv = require('dotenv');
 const connectDB = require('./config/db');
 const userRoutes = require("./routes/userRoutes");
 const taskRoutes = require("./routes/taskRoutes");
+const actionRoutes = require("./routes/actionRoutes");
 
 const http = require("http");
 const { Server } = require("socket.io");
@@ -25,6 +26,9 @@ const io = new Server(server, {
   },
 });
 
+// Make io instance available globally
+global.io = io;
+
 io.on("connection", (socket) => {
   console.log("👤 New user connected:", socket.id);
 
@@ -44,6 +48,10 @@ io.on("connection", (socket) => {
     socket.broadcast.emit("task-added", task);
   });
 
+  // Listen for activity log events (though these are handled automatically by logAction)
+  socket.on("activity-logged", (activity) => {
+    socket.broadcast.emit("activity-logged", activity);
+  });
   
   // Handle disconnection
   socket.on("disconnect", () => {
@@ -59,6 +67,7 @@ app.use(express.json());
 
 app.use("/api/users", userRoutes);
 app.use("/api/tasks", taskRoutes);
+app.use("/api/actions", actionRoutes);
 
 // Define routes
 app.get('/', (req, res) =>{
