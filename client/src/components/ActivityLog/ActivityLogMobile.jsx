@@ -1,6 +1,6 @@
-// client/src/components/ActivityLog/ActivityLogMobile.jsx
 import React, { useState } from 'react';
 import './ActivityLog.css';
+import { Activity } from 'lucide-react';
 
 const LogItem = ({ log, isCurrentUser, isNew }) => (
   <div className={`log-item ${isCurrentUser ? 'highlight' : ''} ${isNew ? 'new-activity' : ''}`}>
@@ -31,7 +31,7 @@ const ActivityLogMobile = ({ logs, currentUserId, newActivityIds }) => {
         onClick={() => setIsOpen(!isOpen)}
         aria-label={isOpen ? 'Hide Activity Log' : 'Show Activity Log'}
       >
-        {isOpen ? '✕' : '📋'}
+        {isOpen ? '✕' : <Activity/>}
         {hasNewActivities && !isOpen && (
           <span className="notification-badge">{newActivityIds.size}</span>
         )}
