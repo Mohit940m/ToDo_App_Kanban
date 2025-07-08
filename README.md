@@ -6,6 +6,8 @@
 
 This is a full-stack, real-time, collaborative Kanban-style To-Do application. It allows teams to manage their tasks seamlessly across different devices. With features like drag-and-drop, real-time updates via WebSockets, and intelligent conflict handling, it's designed to enhance productivity and team collaboration.
 
+Here a video link for project overview: [https://drive.google.com/file/d/1tzaDK3pLD5uv9Wdh1fYP5-d6L72nGFhG/view?usp=sharing]
+
 ## 🛠️ Tech Stack
 
 ### Frontend
