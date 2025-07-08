@@ -15,7 +15,6 @@ Here a video link for project overview: [https://drive.google.com/file/d/1tzaDK3
 -   **Build Tool**: Vite
 -   **Real-time Communication**: Socket.IO Client
 -   **Styling**: CSS with responsive media queries
--   **UI Components**: Lucide React for icons
 -   **Notifications**: React Toastify
 -   **Responsiveness**: react-responsive
 
