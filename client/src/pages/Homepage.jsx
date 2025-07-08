@@ -1,5 +1,4 @@
-import React from "react";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import API from "../api/api"; // Adjust the path as necessary
 import { useMediaQuery } from 'react-responsive';
 import NavBar from "../components/navBar"; // Ensure the path is correct
@@ -30,6 +29,11 @@ function Homepage() {
   const [taskToDelete, setTaskToDelete] = useState(null);
   const [conflict, setConflict] = useState(null);
   const [showTaskCreationModal, setShowTaskCreationModal] = useState(false);
+
+  // State for mobile drag and drop
+  const [draggingTask, setDraggingTask] = useState(null);
+  const [dragOverColumn, setDragOverColumn] = useState(null);
+  const lastHoveredColumn = useRef(null);
 
   // Fetch users
   const getUsers = async () => {
@@ -191,13 +195,8 @@ function Homepage() {
     e.preventDefault();
   };
 
-  // Handle drag and drop
-  const handleDrop = async (e, newStatus) => {
-    e.preventDefault();
-    
-    const taskId = e.dataTransfer.getData("taskId");
+  const moveTask = async (taskId, newStatus) => {
     const task = tasks.find((t) => t._id === taskId);
-
     if (!task) {
       console.log("Task not found");
       return;
@@ -211,8 +210,8 @@ function Homepage() {
       toast.warn("Only the creator or assigned user can move this task.");
       return;
     }
-    
-    if (task.status === newStatus) return;
+
+    if (task.status === newStatus) return; // No change
 
     try {
       // Pass the original task's updatedAt to the server for conflict check
@@ -236,6 +235,13 @@ function Homepage() {
         toast.error("Failed to move task.");
       }
     }
+  };
+
+  // Handle drag and drop for desktop
+  const handleDesktopDrop = async (e, newStatus) => {
+    e.preventDefault();
+    const taskId = e.dataTransfer.getData("taskId");
+    await moveTask(taskId, newStatus);
   };
 
   // Handle task update
@@ -267,6 +273,64 @@ function Homepage() {
         console.error("Update error:", err);
       }
     }
+  };
+
+  // --- Mobile Drag and Drop Handlers ---
+
+  const handleTouchStart = (e, task) => {
+    // Check permissions before starting drag
+    const isCreator = task.createdBy?._id === user._id;
+    const isAssigned = task.assignedTo?._id === user._id;
+    if (!isCreator && !isAssigned) {
+      // Silently ignore or show a toast
+      return;
+    }
+
+    setDraggingTask(task);
+    document.body.classList.add("mobile-drag-active"); // Prevent scrolling
+  };
+
+  const handleTouchMove = (e) => {
+    if (!draggingTask) return;
+
+    // Prevent screen scrolling while dragging a task
+    e.preventDefault();
+
+    const touch = e.touches[0];
+    const elementUnderTouch = document.elementFromPoint(touch.clientX, touch.clientY);
+
+    if (!elementUnderTouch) {
+      setDragOverColumn(null);
+      return;
+    }
+
+    const dropZone = elementUnderTouch.closest('.column');
+    const newHoveredColumn = dropZone ? dropZone.dataset.status : null;
+
+    if (newHoveredColumn !== lastHoveredColumn.current) {
+      lastHoveredColumn.current = newHoveredColumn;
+      setDragOverColumn(newHoveredColumn);
+    }
+  };
+
+  const handleTouchEnd = async () => {
+    if (!draggingTask) return;
+
+    document.body.classList.remove("mobile-drag-active");
+
+    if (dragOverColumn && draggingTask.status !== dragOverColumn) {
+      try {
+        await moveTask(draggingTask._id, dragOverColumn);
+      } catch (error) {
+        console.error("Failed to move task on touch end:", error);
+        // State will be refreshed by the error handler in moveTask if needed
+      }
+    }
+
+    // Reset states
+    setDraggingTask(null);
+    setDragOverColumn(null);
+    lastHoveredColumn.current = null;
   };
 
   // Dynamic style for the homepage container to adjust for the activity log
@@ -303,22 +367,30 @@ function Homepage() {
         </div>
       </div>
 
-      <div className="kanban-board">
+      <div
+        className="kanban-board"
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+      >
         {["Todo", "In Progress", "Done"].map((status) => (
           <div
-            className="column"
+            className={`column ${dragOverColumn === status ? 'drag-over' : ''}`}
             key={status}
+            data-status={status}
             onDragOver={handleDragOver}
-            onDrop={(e) => handleDrop(e, status)}
+            onDrop={(e) => handleDesktopDrop(e, status)}
           >
             <h3>{status}</h3>
             {groupedTasks[status].map((task) => (
               <TaskCard
                 key={task._id}
                 task={task}
-                onClick={setSelectedTask}
                 currentUser={user}
+                onClick={setSelectedTask}
                 onDeleteClick={setTaskToDelete}
+                // Mobile drag props
+                onTouchStart={handleTouchStart}
+                isMobileDragging={draggingTask?._id === task._id}
               />
             ))}
           </div>

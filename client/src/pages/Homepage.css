@@ -421,3 +421,27 @@
   opacity: 0.5;
   transform: rotate(5deg);
 }
+
+/* Style for the task card being dragged on mobile */
+.task-card.mobile-dragging {
+  opacity: 0.5;
+  transform: scale(1.05);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+}
+
+/* Style for the column being hovered over during a drag */
+.column.drag-over {
+  background-color: #eaf2f8; /* A light blue to indicate a valid drop zone */
+  border: 2px dashed #3498db;
+  border-radius: 8px;
+}
+
+/* Prevent the page from scrolling and text from being selected while dragging a task on mobile */
+body.mobile-drag-active {
+  overflow: hidden;
+  -webkit-user-select: none; /* Safari */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* IE10+/Edge */
+  user-select: none; /* Standard */
+}

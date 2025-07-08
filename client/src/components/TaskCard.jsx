@@ -2,7 +2,14 @@ import React from "react";
 import "./TaskCard.css";
 import deleteIcon from "../assets/close.svg";
 
-function TaskCard({ task, onClick, currentUser, onDeleteClick }) {
+function TaskCard({
+  task,
+  onClick,
+  currentUser,
+  onDeleteClick,
+  onTouchStart,
+  isMobileDragging,
+}) {
   // Allow dragging only for the creator or the assigned user.
   const isCreator = task.createdBy?._id === currentUser._id;
   const isAssigned = task.assignedTo?._id === currentUser._id;
@@ -43,11 +50,12 @@ function TaskCard({ task, onClick, currentUser, onDeleteClick }) {
 
   return (
     <div
-      className="task-card"
+      className={`task-card ${isMobileDragging ? "mobile-dragging" : ""}`}
       onClick={() => onClick(task)}
       draggable={isDraggable}
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
+      onTouchStart={(e) => onTouchStart(e, task)}
       style={{
         cursor: isDraggable ? "grab" : "default",
         opacity: isDraggable ? 1 : 0.7
