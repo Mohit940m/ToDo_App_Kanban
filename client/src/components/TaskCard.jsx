@@ -9,6 +9,7 @@ function TaskCard({
   onDeleteClick,
   onTouchStart,
   isMobileDragging,
+  isPressing,
 }) {
   // Allow dragging only for the creator or the assigned user.
   const isCreator = task.createdBy?._id === currentUser._id;
@@ -48,17 +49,23 @@ function TaskCard({
     }
   };
 
+  const classNames = [
+    "task-card",
+    isMobileDragging && "mobile-dragging",
+    isPressing && "mobile-pressing",
+    !isDraggable && "not-draggable",
+  ].filter(Boolean).join(" ");
+
   return (
     <div
-      className={`task-card ${isMobileDragging ? "mobile-dragging" : ""}`}
+      className={classNames}
       onClick={() => onClick(task)}
       draggable={isDraggable}
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
       onTouchStart={(e) => onTouchStart(e, task)}
       style={{
-        cursor: isDraggable ? "grab" : "default",
-        opacity: isDraggable ? 1 : 0.7
+        cursor: isDraggable ? "grab" : "default"
       }}
     >
       {/* 🔹 Title Bar */}

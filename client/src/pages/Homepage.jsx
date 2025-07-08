@@ -33,6 +33,8 @@ function Homepage() {
   // State for mobile drag and drop
   const [draggingTask, setDraggingTask] = useState(null);
   const [dragOverColumn, setDragOverColumn] = useState(null);
+  const [pressingTask, setPressingTask] = useState(null); // For hold-to-drag visual feedback
+  const dragStartTimer = useRef(null);
   const lastHoveredColumn = useRef(null);
 
   // Fetch users
@@ -286,11 +288,25 @@ function Homepage() {
       return;
     }
 
-    setDraggingTask(task);
-    document.body.classList.add("mobile-drag-active"); // Prevent scrolling
+    // Set a timer to initiate drag after a 600ms hold
+    dragStartTimer.current = setTimeout(() => {
+      setDraggingTask(task);
+      setPressingTask(null); // End pressing state
+      document.body.classList.add("mobile-drag-active"); // Prevent scrolling
+      dragStartTimer.current = null;
+    }, 600);
+
+    setPressingTask(task._id); // Start pressing state for visual feedback
   };
 
   const handleTouchMove = (e) => {
+    // If user moves finger before hold duration, cancel the drag initiation
+    if (dragStartTimer.current) {
+      clearTimeout(dragStartTimer.current);
+      dragStartTimer.current = null;
+      setPressingTask(null); // Cancel pressing state
+    }
+
     if (!draggingTask) return;
 
     // Prevent screen scrolling while dragging a task
@@ -314,6 +330,14 @@ function Homepage() {
   };
 
   const handleTouchEnd = async () => {
+    // If user lifts finger before hold duration, cancel the drag
+    if (dragStartTimer.current) {
+      clearTimeout(dragStartTimer.current);
+      dragStartTimer.current = null;
+    }
+
+    setPressingTask(null); // Always end pressing state on touch end
+
     if (!draggingTask) return;
 
     document.body.classList.remove("mobile-drag-active");
@@ -371,6 +395,8 @@ function Homepage() {
         className="kanban-board"
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
+        // Also handle touch cancel events, e.g., if the touch is interrupted by the system
+        onTouchCancel={handleTouchEnd}
       >
         {["Todo", "In Progress", "Done"].map((status) => (
           <div
@@ -391,6 +417,7 @@ function Homepage() {
                 // Mobile drag props
                 onTouchStart={handleTouchStart}
                 isMobileDragging={draggingTask?._id === task._id}
+                isPressing={pressingTask === task._id}
               />
             ))}
           </div>

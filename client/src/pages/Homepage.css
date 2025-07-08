@@ -422,12 +422,24 @@
   transform: rotate(5deg);
 }
 
+/* Style for task cards that cannot be dragged */
+.task-card.not-draggable {
+  opacity: 0.7;
+}
+
 /* Style for the task card being dragged on mobile */
 .task-card.mobile-dragging {
   opacity: 0.5;
   transform: scale(1.05);
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
   z-index: 1000;
+}
+
+/* Style for the task card being pressed before a drag starts */
+.task-card.mobile-pressing {
+  transform: scale(1.03);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: transform 0.1s ease-in-out, box-shadow 0.1s ease-in-out;
 }
 
 /* Style for the column being hovered over during a drag */
