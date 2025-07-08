@@ -17,6 +17,15 @@ function TaskCard({ task, onClick, currentUser, onDeleteClick }) {
     console.log("Drag started for task:", task._id);
     e.dataTransfer.setData("taskId", task._id);
     e.dataTransfer.effectAllowed = "move";
+    // Use a timeout to ensure the browser has created the drag image
+    // before we change the original element's style.
+    setTimeout(() => {
+      e.target.classList.add("dragging");
+    }, 0);
+  };
+
+  const handleDragEnd = (e) => {
+    e.target.classList.remove("dragging");
   };
 
   const getPriorityColor = (priority) => {
@@ -38,6 +47,7 @@ function TaskCard({ task, onClick, currentUser, onDeleteClick }) {
       onClick={() => onClick(task)}
       draggable={isDraggable}
       onDragStart={handleDragStart}
+      onDragEnd={handleDragEnd}
       style={{
         cursor: isDraggable ? "grab" : "default",
         opacity: isDraggable ? 1 : 0.7

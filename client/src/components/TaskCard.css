@@ -300,3 +300,6 @@
   align-items: center;
   justify-content: center;
 }
+.task-card.dragging {
+  opacity: 0.8;
+}
