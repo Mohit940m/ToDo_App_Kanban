@@ -433,6 +433,7 @@
   transform: scale(1.05);
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
   z-index: 1000;
+  pointer-events: none; /* Allows elementFromPoint to see through the dragged item */
 }
 
 /* Style for the task card being pressed before a drag starts */
