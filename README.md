@@ -13,7 +13,6 @@ This is a full-stack, real-time, collaborative Kanban-style To-Do application. I
 -   **Build Tool**: Vite
 -   **Real-time Communication**: Socket.IO Client
 -   **Styling**: CSS with responsive media queries
--   **UI Components**: Lucide React for icons
 -   **Notifications**: React Toastify
 -   **Responsiveness**: react-responsive
 
