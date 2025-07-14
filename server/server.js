@@ -60,7 +60,9 @@ io.on("connection", (socket) => {
 });
 
 app.use(cors({
-    origin: process.env.CLIENT_URL,
+    // origin: process.env.CLIENT_URL,
+    origin:"*",
+    optionsSuccessStatus: 200, // Allow all origins (for development purposes; adjust for production)
     credentials: true, // Allow credentials (cookies, authorization headers, etc.)
 }));
 app.use(express.json());
