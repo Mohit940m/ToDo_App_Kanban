@@ -25,12 +25,19 @@ function Login() {
     }
 
     try {
-      const res = await API.post("/api/users/login", { email, password });
-      localStorage.setItem("user", JSON.stringify(res.data));
-      // Redirect to homepage after successful login
-      window.location.href = "/";
-      navigate("/");
-      
+      const loginRes = await API.post("/api/users/login", { email, password });
+      localStorage.setItem("user", JSON.stringify(loginRes.data));
+
+      // After successful login, check for boards and redirect accordingly.
+      const res = await API.get("/api/users/dashboard");
+      const { boards, lastActiveBoard } = res.data;
+
+      if (boards.length > 0) {
+        const boardToOpen = lastActiveBoard?._id || boards[0]?._id;
+        navigate(`/board/${boardToOpen}`);
+      } else {
+        navigate("/dashboard"); // no boards joined/created yet
+      }
     } catch (err) {
       if (err.response) {
         // The server responded with an error status code (4xx or 5xx)

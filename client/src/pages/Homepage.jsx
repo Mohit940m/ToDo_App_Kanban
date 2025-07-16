@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import API from "../api/api"; // Adjust the path as necessary
 import { useMediaQuery } from 'react-responsive';
+import { useParams } from "react-router-dom";
 import NavBar from "../components/navBar"; // Ensure the path is correct
 import "./Homepage.css"; // optional if you want to add styles
 import { toast } from "react-toastify";
@@ -25,7 +26,7 @@ function Homepage() {
   const [newTitle, setNewTitle] = useState("");
 
   const [selectedTask, setSelectedTask] = useState(null);
-  const [users, setUsers] = useState([]); // Populate from API
+  const [users, setUsers] = useState([]); // Board members only
   const [taskToDelete, setTaskToDelete] = useState(null);
   const [conflict, setConflict] = useState(null);
   const [showTaskCreationModal, setShowTaskCreationModal] = useState(false);
@@ -37,20 +38,22 @@ function Homepage() {
   const dragStartTimer = useRef(null);
   const lastHoveredColumn = useRef(null);
 
-  // Fetch users
-  const getUsers = async () => {
+  const { boardId } = useParams();
+
+  // Fetch board members only
+  const getBoardMembers = async () => {
     try {
-      const res = await API.get("/api/users");
-      setUsers(res.data);
+      const res = await API.get(`/api/boards/${boardId}`);
+      setUsers(res.data.members || []);
     } catch (error) {
-      console.error("Error fetching users", error.message);
+      console.error("Error fetching board members", error.message);
     }
   };
 
-  // Fetch tasks
+  // Fetch tasks for the current board
   const getTasks = async () => {
     try {
-      const res = await API.get("/api/tasks");
+      const res = await API.get(`/api/tasks?boardId=${boardId}`);
       setTasks(res.data);
     } catch (error) {
       console.error("Error fetching tasks", error.message);
@@ -66,11 +69,12 @@ function Homepage() {
         title: newTitle,
         description: "",
         status: "Todo",
+        board: boardId,
       });
 
       setTasks((prev) => [...prev, res.data]);
       // 🔊 Emit socket event for other users
-      socket.emit("task-added", res.data);
+      socket.emit("task-added", {task: res.data, boardId});
 
       setNewTitle("");
       toast.success("Task added successfully!");
@@ -83,11 +87,14 @@ function Homepage() {
   // Create task from modal
   const createTask = async (taskData) => {
     try {
-      const res = await API.post("/api/tasks", taskData);
+      const res = await API.post("/api/tasks", {
+        ...taskData,
+        board: boardId,
+      });
 
       setTasks((prev) => [...prev, res.data]);
       // 🔊 Emit socket event for other users
-      socket.emit("task-added", res.data);
+      socket.emit("task-added", {task: res.data, boardId});
 
       toast.success("Task created successfully!");
     } catch (error) {
@@ -101,10 +108,10 @@ function Homepage() {
   const deleteTask = async (id) => {
     try {
       await API.delete(`/api/tasks/${id}`);
-      setTasks(tasks.filter((task) => task._id !== id))
+      setTasks(prevTasks => prevTasks.filter((task) => task._id !== id));
 
       // 🔊 Emit socket event
-      socket.emit("task-deleted", id);
+      socket.emit("task-deleted", {taskId: id, boardId});
       toast.success("Task deleted successfully.");
     } catch (err) {
       console.error("Failed to delete task", err);
@@ -139,47 +146,75 @@ function Homepage() {
       toast.info("Your changes have been discarded.");
     }
   };
+
   useEffect(() => {
     getTasks();
-    getUsers();
+    getBoardMembers();
 
     // --- Socket.io event listeners for real-time updates ---
-
-    socket.on("task-added", (newTask) => {
-      setTasks((prevTasks) => [...prevTasks, newTask]);
-      toast.info(`A new task was added: "${newTask.title}"`);
-    });
-
-    // Socket.io event listeners
-    socket.on("task-updated", (updatedTask) => {
-      setTasks((prevTasks) =>
-        prevTasks.map((task) =>
-          task._id === updatedTask._id ? updatedTask : task
-        )
-      );
-      toast.info(`Task "${updatedTask.title}" was updated.`);
-    });
-
-    socket.on("task-deleted", (taskId) => {
-      // Find task before filtering to show its name in the toast
-      const deletedTask = tasks.find((task) => task._id === taskId);
-      setTasks((prevTasks) =>
-        prevTasks.filter((task) => task._id !== taskId)
-      );
-      if (deletedTask) {
-        toast.warn(`Task "${deletedTask.title}" was deleted.`);
+    const handleTaskAdded = (data) => {
+      const newTask = data.task || data;
+      if (newTask && newTask._id) {
+        setTasks((prevTasks) => {
+          // Check if task already exists to avoid duplicates
+          const exists = prevTasks.some(task => task._id === newTask._id);
+          if (!exists) {
+            toast.info(`A new task was added: "${newTask.title}"`);
+            return [...prevTasks, newTask];
+          }
+          return prevTasks;
+        });
       }
-    });
+    };
+
+    const handleTaskUpdated = (updatedTask) => {
+      if (updatedTask && updatedTask._id) {
+        setTasks((prevTasks) =>
+          prevTasks.map((task) =>
+            task._id === updatedTask._id ? updatedTask : task
+          )
+        );
+        toast.info(`Task "${updatedTask.title}" was updated.`);
+      }
+    };
+
+    const handleTaskDeleted = (data) => {
+      const taskId = data.taskId || data.id || data;
+      if (taskId) {
+        setTasks((prevTasks) => {
+          const deletedTask = prevTasks.find((task) => task._id === taskId);
+          if (deletedTask) {
+            toast.warn(`Task "${deletedTask.title}" was deleted.`);
+          }
+          return prevTasks.filter((task) => task._id !== taskId);
+        });
+      }
+    };
+
+    socket.on("task-added", handleTaskAdded);
+    socket.on("task-updated", handleTaskUpdated);
+    socket.on("task-deleted", handleTaskDeleted);
 
     // Cleanup function to remove event listeners
     return () => {
-      socket.off("task-added");
-      socket.off("task-updated");
-      socket.off("task-deleted");
+      socket.off("task-added", handleTaskAdded);
+      socket.off("task-updated", handleTaskUpdated);
+      socket.off("task-deleted", handleTaskDeleted);
     };
-  }, [tasks]); // Add `tasks` to dependency array to avoid stale state in listeners
+  }, []); // Remove tasks dependency to avoid stale closures
 
-  // Group tasks by status
+  useEffect(() => {
+    const fetchTasks = async () => {
+      const res = await API.get(`/api/tasks?boardId=${boardId}`);
+      setTasks(res.data);
+    };
+    fetchTasks();
+
+    // Socket join
+    socket.emit("join-board", boardId);
+  }, [boardId]);
+
+  // Group tasks by status with safety checks
   const groupedTasks = {
     Todo: [],
     "In Progress": [],
@@ -187,7 +222,7 @@ function Homepage() {
   };
 
   tasks.forEach((task) => {
-    if (groupedTasks[task.status]) {
+    if (task && task.status && groupedTasks[task.status]) {
       groupedTasks[task.status].push(task);
     }
   });
@@ -225,7 +260,7 @@ function Homepage() {
       setTasks((prev) => prev.map((t) => (t._id === taskId ? res.data : t)));
 
       // 🔊 Emit socket event
-      socket.emit("task-updated", res.data);
+      socket.emit("task-updated", {...res.data, boardId});
       toast.success(`Task moved to ${newStatus}`);
     } catch (err) {
       if (err.response && err.response.status === 409) {
@@ -258,7 +293,7 @@ function Homepage() {
       setTasks((prev) =>
         prev.map((t) => (t._id === updatedTask._id ? res.data : t))
       );
-      socket.emit("task-updated", res.data);
+      socket.emit("task-updated", {...res.data, boardId});
       toast.success("Task updated!");
       setConflict(null); // Close conflict modal if it was open
     } catch (err) {
@@ -280,6 +315,14 @@ function Homepage() {
   // --- Mobile Drag and Drop Handlers ---
 
   const handleTouchStart = (e, task) => {
+    // Add safety check for task object
+    if (!task || !task._id) {
+      console.error("Invalid task object in handleTouchStart:", task);
+      return;
+    }
+
+    console.log("Drag started for task:", task._id);
+
     // Check permissions before starting drag
     const isCreator = task.createdBy?._id === user._id;
     const isAssigned = task.assignedTo?._id === user._id;
@@ -407,19 +450,27 @@ function Homepage() {
             onDrop={(e) => handleDesktopDrop(e, status)}
           >
             <h3>{status}</h3>
-            {groupedTasks[status].map((task) => (
-              <TaskCard
-                key={task._id}
-                task={task}
-                currentUser={user}
-                onClick={setSelectedTask}
-                onDeleteClick={setTaskToDelete}
-                // Mobile drag props
-                onTouchStart={handleTouchStart}
-                isMobileDragging={draggingTask?._id === task._id}
-                isPressing={pressingTask === task._id}
-              />
-            ))}
+            {groupedTasks[status].map((task) => {
+              // Add safety check for task object
+              if (!task || !task._id) {
+                console.error("Invalid task in render:", task);
+                return null;
+              }
+              
+              return (
+                <TaskCard
+                  key={task._id}
+                  task={task}
+                  currentUser={user}
+                  onClick={setSelectedTask}
+                  onDeleteClick={setTaskToDelete}
+                  // Mobile drag props
+                  onTouchStart={handleTouchStart}
+                  isMobileDragging={draggingTask?._id === task._id}
+                  isPressing={pressingTask === task._id}
+                />
+              );
+            })}
           </div>
         ))}
       </div>

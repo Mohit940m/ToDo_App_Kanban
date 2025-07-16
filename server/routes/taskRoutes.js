@@ -4,12 +4,16 @@ const { protect } = require("../middleware/authMiddleware");
 
 const router = express.Router();
 
-router.route("/")
-  .get(protect, getTasks)
-  .post(protect, createTask);
+// Get tasks (can be filtered by boardId via query parameter)
+router.get("/", protect, getTasks);
 
-router.route("/:id")
-  .put(protect, updateTask)
-  .delete(protect, deleteTask);
+// Create a new task
+router.post("/", protect, createTask);
+
+// Update a task
+router.put("/:id", protect, updateTask);
+
+// Delete a task
+router.delete("/:id", protect, deleteTask);
 
 module.exports = router;

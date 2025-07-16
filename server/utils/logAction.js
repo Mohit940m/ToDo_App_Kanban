@@ -1,6 +1,6 @@
 const ActionLog = require("../models/actionLogModel");
 
-const logAction = async ({ userId, actionType, taskId, description }, io = null) => {
+const logAction = async ({ userId, actionType, taskId, description, boardId }, io = null) => {
   try {
     const newAction = await ActionLog.create({
       user: userId,
@@ -15,9 +15,12 @@ const logAction = async ({ userId, actionType, taskId, description }, io = null)
       .populate("task", "title");
 
     // Emit socket event if io instance is provided
-    if (io) {
+    if (io && boardId) {
+      io.to(boardId).emit("activity-logged", populatedAction);
+      console.log("Activity logged and broadcasted to board:", boardId, populatedAction.description);
+    } else if (io) {
       io.emit("activity-logged", populatedAction);
-      console.log("Activity logged and broadcasted:", populatedAction.description);
+      console.log("Activity logged and broadcasted globally:", populatedAction.description);
     }
 
     return populatedAction;

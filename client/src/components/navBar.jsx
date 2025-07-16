@@ -1,11 +1,13 @@
 import React from 'react'
-// import { useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import './navBar.css'
+import { Pointer } from 'lucide-react';
 
 
 
 
 const navBar = () => {
+    const navigate = useNavigate();
 
     const user = JSON.parse(localStorage.getItem("user"));
 
@@ -18,7 +20,9 @@ const navBar = () => {
             <div className="navbar">
                 <h2>Kanban Board</h2>
                 <div>
-                    <span>{user?.name}</span>
+                    <div onClick={() => navigate("/dashboard")} style={{ cursor: "pointer" }}>
+                        <span>{user?.name}</span>
+                    </div>
                     <button onClick={handleLogout}>Logout</button>
                 </div>
             </div>

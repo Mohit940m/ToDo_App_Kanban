@@ -1,0 +1,628 @@
+/* Base Board Settings Styles */
+.board-settings-container {
+  padding: 24px;
+  max-width: 800px;
+  margin: 0 auto;
+  min-height: 100vh;
+  background: #f8f9fa;
+  box-sizing: border-box;
+}
+
+/* Settings Header */
+.settings-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 32px;
+  padding: 20px 0;
+}
+
+.back-btn {
+  padding: 10px 16px;
+  background: #f8f9fa;
+  color: #666;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.back-btn:hover {
+  background: #e9ecef;
+  color: #333;
+  transform: translateX(-2px);
+}
+
+.settings-header h2 {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #333;
+  background: linear-gradient(135deg, #007bff, #28a745);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Settings Content */
+.settings-content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.settings-section {
+  background: white;
+  padding: 24px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e0e0e0;
+  transition: all 0.2s ease;
+}
+
+.settings-section:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+.settings-section h3 {
+  margin: 0 0 20px 0;
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #333;
+  border-bottom: 2px solid #f0f0f0;
+  padding-bottom: 8px;
+}
+
+.settings-section h4 {
+  margin: 0 0 12px 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #333;
+}
+
+/* Form Elements */
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #333;
+  font-size: 14px;
+}
+
+.input-group {
+  display: flex;
+  gap: 12px;
+  align-items: stretch;
+}
+
+.board-name-input {
+  flex: 1;
+  padding: 12px 16px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  font-size: 16px;
+  background: white;
+  transition: all 0.2s ease;
+  min-height: 44px;
+}
+
+.board-name-input:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+}
+
+.board-name-input:disabled {
+  background: #f8f9fa;
+  color: #666;
+  cursor: not-allowed;
+}
+
+.update-btn {
+  padding: 12px 20px;
+  background: linear-gradient(135deg, #007bff, #0056b3);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  min-width: 100px;
+  box-shadow: 0 2px 8px rgba(0, 123, 255, 0.3);
+}
+
+.update-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #0056b3, #004085);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.4);
+}
+
+.update-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Board Info */
+.board-info {
+  background: #f8f9fa;
+  padding: 16px;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+}
+
+.board-info p {
+  margin: 8px 0;
+  font-size: 14px;
+  color: #666;
+}
+
+.board-info strong {
+  color: #333;
+  font-weight: 600;
+}
+
+/* Invite Section */
+.invite-section {
+  background: #f8f9fa;
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+  margin-bottom: 20px;
+}
+
+.invite-input-container {
+  position: relative;
+  display: flex;
+  gap: 12px;
+  align-items: stretch;
+}
+
+.invite-email-input {
+  flex: 1;
+  padding: 12px 16px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 16px;
+  transition: all 0.2s ease;
+  background: white;
+  min-height: 44px;
+}
+
+.invite-email-input:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+}
+
+.user-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 120px; /* Account for invite button width */
+  background: white;
+  border: 1px solid #ddd;
+  border-top: none;
+  border-radius: 0 0 8px 8px;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 10;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.user-option {
+  padding: 12px 16px;
+  cursor: pointer;
+  border-bottom: 1px solid #f0f0f0;
+  transition: background-color 0.2s ease;
+}
+
+.user-option:hover {
+  background: #f8f9fa;
+}
+
+.user-option:last-child {
+  border-bottom: none;
+}
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.user-name {
+  font-weight: 600;
+  color: #333;
+  font-size: 14px;
+}
+
+.user-email {
+  color: #666;
+  font-size: 13px;
+}
+
+.invite-btn {
+  padding: 12px 20px;
+  background: linear-gradient(135deg, #28a745, #20c997);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  min-width: 100px;
+  box-shadow: 0 2px 4px rgba(40, 167, 69, 0.3);
+}
+
+.invite-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #218838, #1ea085);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(40, 167, 69, 0.4);
+}
+
+.invite-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Members List */
+.members-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.member-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  min-height: 44px;
+}
+
+.member-item:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transform: translateY(-1px);
+}
+
+.member-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.member-name {
+  font-weight: 600;
+  color: #333;
+  font-size: 15px;
+}
+
+.member-email {
+  color: #666;
+  font-size: 13px;
+}
+
+.creator-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  background: linear-gradient(135deg, #007bff, #0056b3);
+  color: white;
+  font-size: 11px;
+  border-radius: 4px;
+  font-weight: 600;
+  margin-top: 4px;
+  align-self: flex-start;
+}
+
+.remove-btn {
+  padding: 8px 16px;
+  background: #fff;
+  color: #dc3545;
+  border: 1px solid #dc3545;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.remove-btn:hover {
+  background: #dc3545;
+  color: white;
+  transform: translateY(-1px);
+}
+
+/* Danger Zone */
+.danger-zone {
+  border-color: #dc3545 !important;
+  background: #fff5f5 !important;
+}
+
+.danger-zone h3 {
+  color: #dc3545;
+  border-bottom-color: #dc3545;
+}
+
+.danger-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.danger-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  background: white;
+  border: 1px solid #dc3545;
+  border-radius: 8px;
+  gap: 16px;
+}
+
+.danger-info {
+  flex: 1;
+}
+
+.danger-info h4 {
+  margin: 0 0 4px 0;
+  color: #dc3545;
+  font-size: 16px;
+}
+
+.danger-info p {
+  margin: 0;
+  color: #666;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.delete-board-btn {
+  padding: 12px 20px;
+  background: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  box-shadow: 0 2px 4px rgba(220, 53, 69, 0.3);
+}
+
+.delete-board-btn:hover {
+  background: #c82333;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(220, 53, 69, 0.4);
+}
+
+/* Loading and Error States */
+.loading-spinner,
+.error-message {
+  text-align: center;
+  padding: 40px;
+  font-size: 1.1rem;
+  color: #666;
+}
+
+.error-message {
+  color: #dc3545;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid #dc3545;
+}
+
+/* Mobile Responsive Design */
+@media (max-width: 768px) {
+  .board-settings-container {
+    padding: 16px;
+  }
+
+  .settings-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .settings-header h2 {
+    font-size: 1.8rem;
+  }
+
+  .settings-section {
+    padding: 20px;
+  }
+
+  .input-group {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .board-name-input,
+  .update-btn {
+    width: 100%;
+    min-width: unset;
+  }
+
+  .invite-input-container {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .invite-email-input,
+  .invite-btn {
+    width: 100%;
+    min-width: unset;
+  }
+
+  .user-dropdown {
+    right: 0; /* Full width on mobile */
+  }
+
+  .member-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px;
+  }
+
+  .member-info {
+    width: 100%;
+  }
+
+  .remove-btn {
+    align-self: flex-end;
+    padding: 10px 16px;
+    font-size: 14px;
+  }
+
+  .danger-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .delete-board-btn {
+    width: 100%;
+    padding: 14px 20px;
+    font-size: 16px;
+  }
+}
+
+/* Small mobile devices */
+@media (max-width: 480px) {
+  .board-settings-container {
+    padding: 12px;
+  }
+
+  .settings-header h2 {
+    font-size: 1.6rem;
+  }
+
+  .settings-section {
+    padding: 16px;
+  }
+
+  .member-item {
+    padding: 12px;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .board-settings-container {
+    background: #1a1a1a;
+    color: #ffffff;
+  }
+
+  .settings-section,
+  .board-info,
+  .invite-section,
+  .member-item {
+    background: #2d2d2d;
+    border-color: #404040;
+  }
+
+  .settings-header h2 {
+    color: #ffffff;
+  }
+
+  .board-name-input,
+  .invite-email-input {
+    background: #3a3a3a;
+    border-color: #505050;
+    color: #ffffff;
+  }
+
+  .board-name-input:disabled {
+    background: #404040;
+    color: #999999;
+  }
+
+  .user-dropdown {
+    background: #3a3a3a;
+    border-color: #505050;
+  }
+
+  .user-option:hover {
+    background: #404040;
+  }
+
+  .back-btn {
+    background: #404040;
+    color: #cccccc;
+    border-color: #505050;
+  }
+
+  .back-btn:hover {
+    background: #505050;
+    color: #ffffff;
+  }
+
+  .danger-zone {
+    background: #2d1a1a !important;
+    border-color: #dc3545 !important;
+  }
+
+  .danger-item {
+    background: #2d2d2d;
+  }
+}
+
+/* Focus styles for accessibility */
+.back-btn:focus,
+.board-name-input:focus,
+.update-btn:focus,
+.invite-email-input:focus,
+.invite-btn:focus,
+.remove-btn:focus,
+.delete-board-btn:focus {
+  outline: 3px solid #007bff;
+  outline-offset: 2px;
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  .settings-section,
+  .board-info,
+  .invite-section,
+  .member-item {
+    border: 2px solid #000000;
+  }
+
+  .update-btn,
+  .invite-btn,
+  .remove-btn,
+  .delete-board-btn {
+    border: 2px solid #000000;
+  }
+}
