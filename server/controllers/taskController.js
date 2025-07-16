@@ -1,12 +1,37 @@
 const Task = require("../models/Task");
+const Board = require("../models/boardModel");
 const logAction = require("../utils/logAction");
 
-// GET all tasks for the logged-in user (can filter later by status)
+// GET all tasks for the logged-in user (can filter by board and status)
 const getTasks = async (req, res) => {
   try {
-    const tasks = await Task.find()
+    const { boardId } = req.query;
+    let filter = {};
+    
+    if (boardId) {
+      // Check if user is a member of the board
+      const boardDoc = await Board.findById(boardId);
+      if (!boardDoc) {
+        return res.status(404).json({ message: "Board not found" });
+      }
+      
+      const isMember = boardDoc.members.some(member => member.toString() === req.user._id.toString());
+      if (!isMember) {
+        return res.status(403).json({ message: "You are not a member of this board" });
+      }
+      
+      filter.board = boardId;
+    } else {
+      // If no boardId specified, only return tasks from boards the user is a member of
+      const userBoards = await Board.find({ members: req.user._id }).select('_id');
+      const boardIds = userBoards.map(board => board._id);
+      filter.board = { $in: boardIds };
+    }
+    
+    const tasks = await Task.find(filter)
       .populate("createdBy", "name email")
-      .populate("assignedTo", "name email");
+      .populate("assignedTo", "name email")
+      .populate("board", "name");
     res.status(200).json(tasks);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -15,12 +40,27 @@ const getTasks = async (req, res) => {
 
 // CREATE a task
 const createTask = async (req, res) => {
-  const { title, description, assignedTo, status, priority } = req.body;
+  const { title, description, assignedTo, status, priority, board } = req.body;
 
   try {
-    const existing = await Task.findOne({ title });
+    if (!board) {
+      return res.status(400).json({ message: "Board ID is required" });
+    }
+
+    // Check if user is a member of the board
+    const boardDoc = await Board.findById(board);
+    if (!boardDoc) {
+      return res.status(404).json({ message: "Board not found" });
+    }
+    
+    const isMember = boardDoc.members.some(member => member.toString() === req.user._id.toString());
+    if (!isMember) {
+      return res.status(403).json({ message: "You are not a member of this board" });
+    }
+
+    const existing = await Task.findOne({ title, board });
     if (existing) {
-      return res.status(400).json({ message: "Task title must be unique" });
+      return res.status(400).json({ message: "Task title must be unique within the board" });
     }
 
     const newTask = new Task({
@@ -30,18 +70,21 @@ const createTask = async (req, res) => {
       status: status || "Todo",
       priority: priority || "Medium",
       createdBy: req.user._id,
+      board,
     });
 
     const saved = await newTask.save();
     const populatedTask = await Task.findById(saved._id)
       .populate("createdBy", "name email")
-      .populate("assignedTo", "name email");
+      .populate("assignedTo", "name email")
+      .populate("board", "name");
 
     await logAction({
       userId: req.user._id,
       actionType: "create",
       taskId: newTask._id,
       description: `Created task "${newTask.title}"`,
+      boardId: board,
     }, global.io);
     res.status(201).json(populatedTask);
     console.log("Task created:", populatedTask);
@@ -110,6 +153,7 @@ const updateTask = async (req, res) => {
       actionType,
       taskId: updated._id,
       description,
+      boardId: updated.board,
     }, global.io);
 
     res.status(200).json(updated);
@@ -143,6 +187,7 @@ const deleteTask = async (req, res) => {
       actionType: "delete",
       taskId: task._id,
       description: `Deleted task "${task.title}"`,
+      boardId: task.board,
     }, global.io);
 
     await task.deleteOne();

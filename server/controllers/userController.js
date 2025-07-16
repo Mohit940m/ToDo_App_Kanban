@@ -3,6 +3,8 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const generateToken = require('../utils/jwtHelper');
 const Task = require("../models/Task");
+const Board = require("../models/boardModel");
+
 
 // Register a new user
 const registerUser = async (req, res) => {
@@ -103,4 +105,38 @@ const getLeastBusyUser = async (req, res) => {
   }
 };
 
-module.exports = {registerUser, loginUser, getAllUsers, getLeastBusyUser};
+// set the last active user board
+const setLastActiveBoard = async (req, res) => {
+  const { boardId } = req.body;
+
+  const user = await User.findById(req.user._id);
+  if (!user) return res.status(404).json({ message: "User not found" });
+
+  user.lastActiveBoard = boardId;
+  await user.save();
+
+  res.status(200).json({ message: "Last active board updated" });
+};
+
+//  
+const getUserDashboard = async (req, res) => {
+  const user = await User.findById(req.user._id).populate("lastActiveBoard", "name _id");
+  if (!user) return res.status(404).json({ message: "User not found" });
+
+  const boards = await Board.find({ members: req.user._id }).select("name _id");
+
+  res.status(200).json({
+    boards,
+    lastActiveBoard: user.lastActiveBoard,
+  });
+};
+
+
+module.exports = {
+    registerUser, 
+    loginUser, 
+    getAllUsers, 
+    getLeastBusyUser, 
+    setLastActiveBoard, 
+    getUserDashboard 
+};
