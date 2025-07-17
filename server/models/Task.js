@@ -5,7 +5,7 @@ const taskSchema = new mongoose.Schema(
     title: {
       type: String,
       required: true,
-      unique: true, // Title must be unique per board
+      // unique: true, // Title must be unique per board
     },
     description: {
       type: String,
@@ -27,6 +27,11 @@ const taskSchema = new mongoose.Schema(
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
+      required: true,
+    },
+    board: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Board",
       required: true,
     }
   },

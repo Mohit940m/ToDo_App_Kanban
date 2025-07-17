@@ -4,6 +4,7 @@ const dotenv = require('dotenv');
 const connectDB = require('./config/db');
 const userRoutes = require("./routes/userRoutes");
 const taskRoutes = require("./routes/taskRoutes");
+const boardRoutes = require("./routes/boardRoutes");
 const actionRoutes = require("./routes/actionRoutes");
 
 const http = require("http");
@@ -32,25 +33,45 @@ global.io = io;
 io.on("connection", (socket) => {
   console.log("👤 New user connected:", socket.id);
 
+  socket.on("join-board", (boardId) => {
+    socket.join(boardId);
+    console.log(`User ${socket.id} joined board: ${boardId}`);
+  });
+
   // Listen for task updates
   socket.on("task-updated", (data) => {
-    socket.broadcast.emit("task-updated", data); // broadcast to all other clients
-    console.log("Task updated:", data);
+    const { boardId, ...taskData } = data;
+    if (boardId) {
+      socket.to(boardId).emit("task-updated", taskData);
+      console.log("Task updated and broadcasted to board:", boardId);
+    }
   });
 
   // Listen for task deletion
-  socket.on("task-deleted", (taskId) => {
-    socket.broadcast.emit("task-deleted", taskId);
+  socket.on("task-deleted", (data) => {
+    const { taskId, boardId } = data;
+    if (boardId && taskId) {
+      socket.to(boardId).emit("task-deleted", { taskId });
+      console.log("Task deleted and broadcasted to board:", boardId);
+    }
   });
 
   // Listen for new task addition
-  socket.on("task-added", (task) => {
-    socket.broadcast.emit("task-added", task);
+  socket.on("task-added", (data) => {
+    const { task, boardId } = data;
+    if (boardId && task) {
+      socket.to(boardId).emit("task-added", { task });
+      console.log("Task added and broadcasted to board:", boardId);
+    }
   });
 
   // Listen for activity log events (though these are handled automatically by logAction)
-  socket.on("activity-logged", (activity) => {
-    socket.broadcast.emit("activity-logged", activity);
+  socket.on("activity-logged", (data) => {
+    const { activity, boardId } = data;
+    if (boardId && activity) {
+      socket.to(boardId).emit("activity-logged", activity);
+      console.log("Activity logged and broadcasted to board:", boardId);
+    }
   });
   
   // Handle disconnection
@@ -69,6 +90,7 @@ app.use(express.json());
 
 app.use("/api/users", userRoutes);
 app.use("/api/tasks", taskRoutes);
+app.use("/api/boards", boardRoutes);
 app.use("/api/actions", actionRoutes);
 
 // Define routes
