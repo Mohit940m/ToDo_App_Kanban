@@ -3,7 +3,8 @@ import API from "../api/api";
 import { useNavigate, Link } from "react-router-dom";
 import "./../components/AuthForm.css";
 
-function Login() {
+// Accept onLoginSuccess as a prop
+function Login({ onLoginSuccess }) {
   const [form, setForm] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
   const navigate = useNavigate();
@@ -26,7 +27,12 @@ function Login() {
 
     try {
       const loginRes = await API.post("/api/users/login", { email, password });
-      localStorage.setItem("user", JSON.stringify(loginRes.data));
+
+      // Call the prop function to update the user state in App.jsx
+      if (onLoginSuccess) {
+        onLoginSuccess(loginRes.data);
+      }
+      // localStorage.setItem("user", JSON.stringify(loginRes.data)); // This is now handled by onLoginSuccess
 
       // After successful login, check for boards and redirect accordingly.
       const res = await API.get("/api/users/dashboard");
@@ -34,15 +40,15 @@ function Login() {
 
       if (boards.length > 0) {
         const boardToOpen = lastActiveBoard?._id || boards[0]?._id;
+        console.log("Navigating to board:", `/board/${boardToOpen}`);
         navigate(`/board/${boardToOpen}`);
       } else {
+        console.log("Navigating to dashboard.");
         navigate("/dashboard"); // no boards joined/created yet
       }
     } catch (err) {
       if (err.response) {
-        // The server responded with an error status code (4xx or 5xx)
         if (err.response.data && err.response.data.message) {
-          // Use the error message from the backend if available
           setError(err.response.data.message);
         } else if (err.response.status === 401 || err.response.status === 400) {
           setError("Invalid email or password.");
@@ -50,10 +56,8 @@ function Login() {
           setError("An unexpected error occurred. Please try again.");
         }
       } else if (err.request) {
-        // The request was made but no response was received
         setError("Network error. Please check your connection.");
       } else {
-        // Something else happened in setting up the request that triggered an Error
         setError("An unexpected error occurred. Please try again.");
       }
     }
