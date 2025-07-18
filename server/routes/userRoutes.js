@@ -14,7 +14,7 @@ router.post("/login", loginUser);
 router.get("/", getAllUsers);
 
 // Get least busy user (for task assignment)
-router.get("/least-busy", getLeastBusyUser);
+router.get("/least-busy/:boardId", getLeastBusyUser);
 
 // save last active board
 router.put("/last-active-board", protect, setLastActiveBoard); // chack for bugs in future 

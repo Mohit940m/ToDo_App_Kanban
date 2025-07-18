@@ -83,24 +83,42 @@ const getAllUsers = async (req, res) => {
 
 const getLeastBusyUser = async (req, res) => {
   try {
-    const users = await User.find({}, "_id name");
+    // 1. Get the boardId from the URL
+    const { boardId } = req.params;
 
-    // Get task counts per user
+    // 2. Find the board and populate its members
+    const board = await Board.findById(boardId).populate('members', '_id name');
+    
+    if (!board) {
+      return res.status(404).json({ message: "Board not found" });
+    }
+    
+    const usersOnBoard = board.members;
+
+    if (usersOnBoard.length === 0) {
+        return res.status(404).json({ message: "No users found on this board" });
+    }
+
+    // 3. Get task counts for each user on this specific board
     const taskCounts = await Promise.all(
-      users.map(async (user) => {
+      usersOnBoard.map(async (user) => {
         const count = await Task.countDocuments({
           assignedTo: user._id,
           status: { $ne: "Done" },
+          board: boardId // 🎯 The crucial filter!
         });
         return { user, count };
       })
     );
 
-    // Sort by fewest active tasks
+    // 4. Sort by fewest active tasks
     taskCounts.sort((a, b) => a.count - b.count);
 
-    res.json(taskCounts[0].user); // return the least busy user
+    // 5. Return the least busy user
+    res.json(taskCounts[0].user);
+    
   } catch (err) {
+    console.error(err); // Log the error for debugging
     res.status(500).json({ message: "Failed to calculate workload" });
   }
 };

@@ -3,7 +3,7 @@ import "./TaskModal.css";
 import API from "../api/api";
 import { toast } from "react-toastify";
 
-function TaskModal({ task, users, onClose, onSave, onDelete, currentUser }) {
+function TaskModal({ task, users, onClose, onSave, onDelete, currentUser, boardId }) {
     const [editedTask, setEditedTask] = useState({ ...task });
     const [isEditingDescription, setIsEditingDescription] = useState(false);
 
@@ -72,18 +72,28 @@ function TaskModal({ task, users, onClose, onSave, onDelete, currentUser }) {
 
     // Handle task smart assignment
     const handleSmartAssign = async () => {
+        if (!boardId) {
+            console.error("Board ID is missing!");
+            toast.error("Board ID is missing!");
+            return;
+        }
+
         try {
-            const res = await API.get("/api/users/least-busy");
+            const res = await API.get(`/api/users/least-busy/${boardId}`);
             const leastBusyUser = res.data;
 
-            setEditedTask((prev) => ({
-                ...prev,
-                assignedTo: leastBusyUser._id,
-            }));
+            // Assign the task to the least busy user
+            setEditedTask({
+                ...editedTask,
+                assignedTo: leastBusyUser
+            });
 
-            toast.success(`Task assigned to ${leastBusyUser.name}`);
+            toast.success(`Task assigned to ${leastBusyUser.name} (least busy user)`);
+            console.log("Least busy user:", leastBusyUser);
+
         } catch (err) {
-            toast.error("Smart assign failed");
+            console.error("Failed to find least busy user:", err);
+            toast.error("Failed to find least busy user");
         }
     };
 
@@ -193,7 +203,7 @@ function TaskModal({ task, users, onClose, onSave, onDelete, currentUser }) {
                                     </option>
                                 ))}
                             </select>
-                            <button onClick={handleSmartAssign} className="smart-assign-btn" disabled={!canEditAssignments}>
+                            <button onClick={() => handleSmartAssign(task)} className="smart-assign-btn" disabled={!canEditAssignments}>
                                 ✨ Smart Assign
                             </button>
                         </div>

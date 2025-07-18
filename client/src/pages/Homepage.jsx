@@ -483,6 +483,7 @@ function Homepage() {
           onSave={handleTaskUpdate}
           onDelete={handleModalDelete}
           currentUser={user}
+          boardId={boardId}
         />
       )}
 
