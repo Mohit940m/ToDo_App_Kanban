@@ -88,7 +88,7 @@ function TaskModal({ task, users, onClose, onSave, onDelete, currentUser, boardI
                 assignedTo: leastBusyUser
             });
 
-            toast.success(`Task assigned to ${leastBusyUser.name} (least busy user)`);
+            toast.success(`Task assigned to ${leastBusyUser.name}`);
             console.log("Least busy user:", leastBusyUser);
 
         } catch (err) {
