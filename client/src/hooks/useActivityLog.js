@@ -23,10 +23,13 @@ export const useActivityLog = () => {
         
         // Fetch activities for the current board if boardId exists
         const url = boardId ? `/api/actions?boardId=${boardId}` : '/api/actions';
+        console.log('Fetching activity logs from:', url);
         const response = await API.get(url);
+        console.log('Activity logs response:', response.data);
         setLogs(response.data);
       } catch (err) {
         console.error('Error fetching activity logs:', err);
+        console.error('Error details:', err.response);
         setError(err.response?.data?.message || 'Failed to fetch activity logs');
       } finally {
         setLoading(false);

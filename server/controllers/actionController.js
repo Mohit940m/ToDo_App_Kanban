@@ -5,6 +5,8 @@ const getRecentActions = async (req, res) => {
   try {
     const { boardId } = req.query;
     
+    console.log("Fetching actions for user:", req.user._id, "boardId:", boardId);
+    
     if (boardId) {
       // Check if user is a member of the board
       const boardDoc = await Board.findById(boardId);
@@ -31,13 +33,27 @@ const getRecentActions = async (req, res) => {
         }
       });
 
+    console.log("Total actions found:", actions.length);
+
     // Get user's boards for filtering
     const userBoards = await Board.find({ members: req.user._id }).select('_id');
     const userBoardIds = userBoards.map(board => board._id.toString());
+    
+    console.log("User boards:", userBoardIds);
 
     // Filter actions based on board membership
     const filteredActions = actions.filter(action => {
-      if (!action.task || !action.task.board) return false;
+      // If task is null or deleted, skip this action
+      if (!action.task) {
+        console.log("Skipping action with no task:", action._id);
+        return false;
+      }
+      
+      // If task has no board, skip this action
+      if (!action.task.board) {
+        console.log("Skipping action with task but no board:", action._id, action.task.title);
+        return false;
+      }
       
       const taskBoardId = action.task.board._id.toString();
       
@@ -48,6 +64,7 @@ const getRecentActions = async (req, res) => {
       }
     }).slice(0, 20); // Limit to 20 after filtering
 
+    console.log("Filtered actions:", filteredActions.length);
     res.json(filteredActions);
   } catch (err) {
     console.error("Error fetching actions:", err);
