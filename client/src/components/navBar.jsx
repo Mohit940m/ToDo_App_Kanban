@@ -6,7 +6,7 @@ import { Pointer } from 'lucide-react';
 
 
 
-const navBar = () => {
+const NavBar = () => {
     const navigate = useNavigate();
 
     const user = JSON.parse(localStorage.getItem("user"));
@@ -30,4 +30,4 @@ const navBar = () => {
     )
 }
 
-export default navBar
+export default NavBar

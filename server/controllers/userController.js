@@ -141,7 +141,9 @@ const getUserDashboard = async (req, res) => {
   const user = await User.findById(req.user._id).populate("lastActiveBoard", "name _id");
   if (!user) return res.status(404).json({ message: "User not found" });
 
-  const boards = await Board.find({ members: req.user._id }).select("name _id");
+  const boards = await Board.find({ members: req.user._id })
+    .populate("createdBy", "_id name")
+    .lean();
 
   res.status(200).json({
     boards,

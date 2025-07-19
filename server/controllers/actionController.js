@@ -19,7 +19,7 @@ const getRecentActions = async (req, res) => {
     }
 
     const actions = await ActionLog.find()
-      .sort({ timestamp: -1 })
+      .sort({ createdAt: -1 })
       .limit(50) // Get more to filter later
       .populate("user", "name email")
       .populate({

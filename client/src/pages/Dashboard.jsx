@@ -2,7 +2,9 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import API from "../api/api";
 import "./Dashboard.css";
+import NavBar from "../components/navBar";
 import settingsIcon from "../assets/settings.svg";
+import { toast } from "react-toastify";
 
 const Dashboard = ({ user }) => {
   const [boards, setBoards] = useState([]);
@@ -79,7 +81,7 @@ const Dashboard = ({ user }) => {
       navigate(`/board/${res.data._id}`);
     } catch (err) {
       console.error("Failed to create board:", err);
-      alert("Error creating board. Try a different name.");
+      toast.error(err.response?.data?.message || "Error creating board. Try a different name.");
     }
   };
 
@@ -102,14 +104,14 @@ const Dashboard = ({ user }) => {
         email: inviteEmail 
       });
       
-      alert(`Successfully invited ${inviteEmail} to ${selectedBoard.name}`);
+      toast.success(`Successfully invited ${inviteEmail} to ${selectedBoard.name}`);
       setShowInviteModal(false);
       setInviteEmail("");
       setSelectedBoard(null);
       setShowUserDropdown(false);
     } catch (err) {
       console.error("Failed to invite user:", err);
-      alert(err.response?.data?.message || "Failed to invite user");
+      toast.error(err.response?.data?.message || "Failed to invite user");
     } finally {
       setInviteLoading(false);
     }
@@ -134,7 +136,9 @@ const Dashboard = ({ user }) => {
   };
 
   const isCreator = (board) => {
-    return board.createdBy === user?._id;
+    console.log("Board:", board);
+    console.log("User:", user);
+    return board.createdBy?._id === user?._id;
   };
 
   const handleBoardSettings = (board) => {
@@ -156,11 +160,12 @@ const Dashboard = ({ user }) => {
       <div className="loading-spinner">Loading dashboard...</div>
     </div>
   );
-
+  
   return (
     <div className="dashboard-container">
+      <NavBar />
       <div className="dashboard-header">
-        <h2>Welcome back, {user?.username || "User"}!</h2>
+        <h2>Welcome back, {user?.name|| "User"}!</h2>
         <p className="dashboard-subtitle">Manage your boards and collaborate with your team</p>
       </div>
 
