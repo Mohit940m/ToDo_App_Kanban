@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import API from "../api/api";
 import "./BoardSettings.css";
+import { toast } from "react-toastify";
 
 const BoardSettings = ({ user }) => {
   const { boardId } = useParams();
@@ -61,7 +62,7 @@ const BoardSettings = ({ user }) => {
   }, [inviteEmail, allUsers, members]);
 
   const isCreator = () => {
-    return board?.createdBy === user?._id;
+    return board.createdBy?._id === user?._id;
   };
 
   const handleUpdateBoardName = async () => {
@@ -69,17 +70,17 @@ const BoardSettings = ({ user }) => {
 
     setUpdateLoading(true);
     try {
-      const res = await API.put(`/api/boards/${boardId}`, { name: boardName });
+      const res = await API.put(`/api/boards/${boardId}/rename`, { name: boardName });
       setBoard(res.data);
-      alert("Board name updated successfully!");
+      toast.success("Board renamed successfully!");
     } catch (err) {
-      console.error("Failed to update board name:", err);
-      alert("Failed to update board name");
+      console.error("Failed to rename board:", err);
+      toast.error(err.response?.data?.message || "Failed to rename board");
       setBoardName(board.name); // Reset to original name
     } finally {
       setUpdateLoading(false);
     }
-  };
+  }; 
 
   const handleInviteUser = async () => {
     if (!inviteEmail.trim()) return;
@@ -96,10 +97,10 @@ const BoardSettings = ({ user }) => {
       
       setInviteEmail("");
       setShowUserDropdown(false);
-      alert(`Successfully invited ${inviteEmail} to the board`);
+      toast.success(`Successfully invited ${inviteEmail} to the board`);
     } catch (err) {
       console.error("Failed to invite user:", err);
-      alert(err.response?.data?.message || "Failed to invite user");
+      toast.error(err.response?.data?.message || "Failed to invite user");
     } finally {
       setInviteLoading(false);
     }
@@ -107,7 +108,7 @@ const BoardSettings = ({ user }) => {
 
   const handleRemoveMember = async (memberId) => {
     if (memberId === board.createdBy) {
-      alert("Cannot remove the board creator");
+      toast.warn("Cannot remove the board creator.");
       return;
     }
 
@@ -115,10 +116,10 @@ const BoardSettings = ({ user }) => {
       try {
         await API.delete(`/api/boards/${boardId}/members/${memberId}`);
         setMembers(members.filter(member => member._id !== memberId));
-        alert("Member removed successfully");
+        toast.success("Member removed successfully");
       } catch (err) {
         console.error("Failed to remove member:", err);
-        alert("Failed to remove member");
+        toast.error("Failed to remove member");
       }
     }
   };
@@ -127,11 +128,11 @@ const BoardSettings = ({ user }) => {
     if (window.confirm("Are you sure you want to delete this board? This action cannot be undone.")) {
       try {
         await API.delete(`/api/boards/${boardId}`);
-        alert("Board deleted successfully");
+        toast.success("Board deleted successfully");
         navigate("/dashboard");
       } catch (err) {
         console.error("Failed to delete board:", err);
-        alert("Failed to delete board");
+        toast.error("Failed to delete board");
       }
     }
   };

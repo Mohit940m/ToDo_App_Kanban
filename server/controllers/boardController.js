@@ -117,6 +117,33 @@ const removeMemberFromBoard = async (req, res) => {
   }
 };
 
+const renameBoard = async (req, res) => {
+  try {
+    const board = await Board.findById(req.params.id);
+    if (!board) return res.status(404).json({ message: "Board not found" });
+
+    if (String(board.createdBy) !== req.user._id.toString()) {
+      return res.status(403).json({ message: "Only the creator can rename the board" });
+    }
+
+    const { name } = req.body;
+    if (!name || !name.trim()) {
+      return res.status(400).json({ message: "Board name is required" });
+    }
+
+    board.name = name.trim();
+    await board.save();
+
+    const updatedBoard = await Board.findById(board._id)
+      .populate("createdBy", "name email")
+      .populate("members", "name email");
+
+    res.json(updatedBoard);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 const deleteBoard = async (req, res) => {
   try {
     const board = await Board.findById(req.params.id);
@@ -144,5 +171,6 @@ module.exports = {
   updateBoard,
   addUserToBoard,
   removeMemberFromBoard,
+  renameBoard,
   deleteBoard,
 };
