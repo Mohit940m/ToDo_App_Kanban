@@ -4,16 +4,15 @@ import { useParams } from 'react-router-dom';
 import { io } from 'socket.io-client';
 import API from '../api/api';
 
-export const useActivityLog = () => {
+export const useActivityLog = (user) => {
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [newActivityIds, setNewActivityIds] = useState(new Set());
   const { boardId } = useParams();
   
-  // Get current user ID
-  const user = JSON.parse(localStorage.getItem("user"));
-  const currentUserId = user?._id;
+  // Get current user ID from Auth0 user object
+  const currentUserId = user?.sub || user?._id;
 
   useEffect(() => {
     const fetchLogs = async () => {

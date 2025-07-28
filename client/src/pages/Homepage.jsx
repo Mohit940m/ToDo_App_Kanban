@@ -16,12 +16,10 @@ import ActivityLogContainer from '../components/ActivityLog/ActivityLogContainer
 
 const socket = io(import.meta.env.VITE_API_URL);
 
-function Homepage() {
+function Homepage({ user }) {
   // State to manage desktop activity log visibility
   const [isActivityLogVisible, setIsActivityLogVisible] = useState(true);
   const isDesktop = useMediaQuery({ query: '(min-width: 769px)' });
-
-  const user = JSON.parse(localStorage.getItem("user"));
   const [tasks, setTasks] = useState([]);
   const [newTitle, setNewTitle] = useState("");
 
@@ -517,6 +515,7 @@ function Homepage() {
       <ActivityLogContainer
         isDesktopVisible={isActivityLogVisible}
         onToggleDesktopVisibility={() => setIsActivityLogVisible(prev => !prev)}
+        user={user}
       />
     </div>
   );

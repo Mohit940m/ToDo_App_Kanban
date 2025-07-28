@@ -7,8 +7,8 @@ import ActivityLogMobile from './ActivityLogMobile';
 import './ActivityLog.css'; // For loading/error styles
 
 // Accept the new props from Homepage.jsx
-const ActivityLogContainer = ({ isDesktopVisible, onToggleDesktopVisibility }) => {
-  const { logs, newActivityIds, loading, error, currentUserId } = useActivityLog();
+const ActivityLogContainer = ({ isDesktopVisible, onToggleDesktopVisibility, user }) => {
+  const { logs, newActivityIds, loading, error, currentUserId } = useActivityLog(user);
   const isDesktop = useMediaQuery({ query: '(min-width: 769px)' });
 
   if (loading && isDesktop) {

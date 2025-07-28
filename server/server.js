@@ -9,9 +9,29 @@ const actionRoutes = require("./routes/actionRoutes");
 
 const http = require("http");
 const { Server } = require("socket.io");
+const { auth } = require("express-openid-connect");
 
-// Initialize environment variables and connect to the database
+// Initialize environment variables first
 dotenv.config();
+
+// Auth0 configuration - after dotenv.config()
+const config = {
+  authRequired: false,
+  auth0Logout: true,
+  secret: process.env.AUTH0_SECRET,
+  baseURL: process.env.BASE_URL,
+  clientID: process.env.AUTH0_CLIENT_ID,
+  issuerBaseURL: `https://${process.env.AUTH0_DOMAIN}`,
+};
+
+// Debug Auth0 configuration
+console.log('Auth0 Configuration:');
+console.log('- Secret:', process.env.AUTH0_SECRET ? '***SET***' : 'NOT SET');
+console.log('- Base URL:', process.env.BASE_URL);
+console.log('- Client ID:', process.env.AUTH0_CLIENT_ID);
+console.log('- Issuer Base URL:', `https://${process.env.AUTH0_DOMAIN}`);
+
+// Connect to the database
 connectDB();
 
 const app = express();
@@ -87,6 +107,9 @@ app.use(cors({
     credentials: true, // Allow credentials (cookies, authorization headers, etc.)
 }));
 app.use(express.json());
+
+// Temporarily disable Auth0 middleware to test frontend
+// app.use(auth(config));
 
 app.use("/api/users", userRoutes);
 app.use("/api/tasks", taskRoutes);
