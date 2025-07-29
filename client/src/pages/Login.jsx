@@ -1,21 +1,17 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import Auth0Test from "../components/Auth0Test";
 import "./../components/AuthForm.css";
 
-// Accept loginWithRedirect as a prop from App.jsx
-function Login({ loginWithRedirect }) {
+// Accept login function as a prop from App.jsx
+function Login({ login }) {
   return (
     <div className="auth-container">
       <div className="auth-form">
         <h2>Welcome to Kanban Board</h2>
         <p>Please log in to access your boards and tasks.</p>
         
-        {/* Temporary Auth0 Test Component */}
-        <Auth0Test />
-        
         <button 
-          onClick={() => loginWithRedirect()}
+          onClick={login}
           className="auth-button"
           style={{
             width: '100%',

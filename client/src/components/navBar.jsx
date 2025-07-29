@@ -1,12 +1,12 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useAuth0 } from "@auth0/auth0-react"
+import { useAuthContext } from "../contexts/AuthContext"
 import './navBar.css'
 import { Pointer } from 'lucide-react';
 
 const NavBar = () => {
     const navigate = useNavigate();
-    const { isAuthenticated, loginWithRedirect, logout, user } = useAuth0();
+    const { isAuthenticated, login, logout, user } = useAuthContext();
 
     return (
         <div>
@@ -18,12 +18,12 @@ const NavBar = () => {
                             <div onClick={() => navigate("/dashboard")} style={{ cursor: "pointer" }}>
                                 <span>{user?.name || user?.email}</span>
                             </div>
-                            <button onClick={() => logout({ returnTo: window.location.origin })}>
+                            <button onClick={logout}>
                                 Log Out
                             </button>
                         </>
                     ) : (
-                        <button onClick={() => loginWithRedirect()}>
+                        <button onClick={login}>
                             Log In
                         </button>
                     )}

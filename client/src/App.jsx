@@ -1,21 +1,20 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import React from "react";
-import { useAuth0 } from "@auth0/auth0-react";
+import { useAuthContext } from "./contexts/AuthContext";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import Homepage from "./pages/Homepage"; // This is your Board component
 import BoardSettings from "./pages/BoardSettings";
-import Auth0Test from "./components/Auth0Test"; // Temporary test component
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 function App() {
-  // Use Auth0 hooks instead of localStorage and useState
-  const { isAuthenticated, loginWithRedirect, logout, user, isLoading } = useAuth0();
+  // Use AuthContext instead of Auth0
+  const { isAuthenticated, login, logout, user, loading } = useAuthContext();
 
-  // Show loading spinner while Auth0 is initializing
-  if (isLoading) {
+  // Show loading spinner while checking authentication
+  if (loading) {
     return (
       <div style={{ 
         display: 'flex', 
@@ -50,7 +49,7 @@ function App() {
         />
         <Route
           path="/login"
-          element={!isAuthenticated ? <Login loginWithRedirect={loginWithRedirect} /> : <Navigate to="/dashboard" />}
+          element={!isAuthenticated ? <Login login={login} /> : <Navigate to="/dashboard" />}
         />
         <Route
           path="/register"

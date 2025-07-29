@@ -101,15 +101,41 @@ io.on("connection", (socket) => {
 });
 
 app.use(cors({
-    // origin: process.env.CLIENT_URL,
-    origin:"*",
-    optionsSuccessStatus: 200, // Allow all origins (for development purposes; adjust for production)
+    origin: process.env.CLIENT_URL, // Use specific origin for security
+    optionsSuccessStatus: 200,
     credentials: true, // Allow credentials (cookies, authorization headers, etc.)
 }));
 app.use(express.json());
 
-// Temporarily disable Auth0 middleware to test frontend
-// app.use(auth(config));
+// Enable Auth0 middleware
+app.use(auth(config));
+
+// Auth0 routes
+app.get('/login', (req, res) => {
+  res.oidc.login({
+    returnTo: process.env.CLIENT_URL
+  });
+});
+
+app.get('/logout', (req, res) => {
+  res.oidc.logout({
+    returnTo: process.env.CLIENT_URL
+  });
+});
+
+app.get('/profile', (req, res) => {
+  if (req.oidc.isAuthenticated()) {
+    res.json({
+      isAuthenticated: true,
+      user: req.oidc.user
+    });
+  } else {
+    res.json({
+      isAuthenticated: false,
+      user: null
+    });
+  }
+});
 
 app.use("/api/users", userRoutes);
 app.use("/api/tasks", taskRoutes);

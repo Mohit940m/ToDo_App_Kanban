@@ -1,5 +1,4 @@
-import React, { createContext, useContext, useEffect } from 'react';
-import { useAuth0 } from '@auth0/auth0-react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 import API from '../api/api';
 
 const AuthContext = createContext();
@@ -13,34 +12,50 @@ export const useAuthContext = () => {
 };
 
 export const AuthProvider = ({ children }) => {
-  const { getAccessTokenSilently, isAuthenticated, user } = useAuth0();
+  const [user, setUser] = useState(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [loading, setLoading] = useState(true);
 
+  // Check authentication status on mount
   useEffect(() => {
-    // For now, let's disable the token interceptor to test basic Auth0 functionality
-    // We'll re-enable this once the basic authentication is working
-    console.log('Auth0 Status:', { isAuthenticated, user: user?.email });
-    
-    // Simple interceptor that doesn't try to get tokens yet
-    const requestInterceptor = API.interceptors.request.use(
-      (config) => {
-        // For now, just log that we're making a request
-        console.log('Making API request:', config.url);
-        return config;
-      },
-      (error) => {
-        return Promise.reject(error);
-      }
-    );
+    checkAuthStatus();
+  }, []);
 
-    // Cleanup function to remove interceptor
-    return () => {
-      API.interceptors.request.eject(requestInterceptor);
-    };
-  }, [isAuthenticated, user]);
+  const checkAuthStatus = async () => {
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/profile`, {
+        credentials: 'include' // Include cookies for session
+      });
+      const data = await response.json();
+      
+      setIsAuthenticated(data.isAuthenticated);
+      setUser(data.user);
+    } catch (error) {
+      console.error('Auth check failed:', error);
+      setIsAuthenticated(false);
+      setUser(null);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const login = () => {
+    // Redirect to backend login route
+    window.location.href = `${import.meta.env.VITE_API_URL}/login`;
+  };
+
+  const logout = () => {
+    // Redirect to backend logout route
+    window.location.href = `${import.meta.env.VITE_API_URL}/logout`;
+  };
 
   const value = {
     user,
     isAuthenticated,
+    loading,
+    login,
+    logout,
+    checkAuthStatus
   };
 
   return (
