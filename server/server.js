@@ -33,9 +33,27 @@ global.io = io;
 io.on("connection", (socket) => {
   console.log("👤 New user connected:", socket.id);
 
-  socket.on("join-board", (boardId) => {
-    socket.join(boardId);
-    console.log(`User ${socket.id} joined board: ${boardId}`);
+  socket.on("join-board", (boardId, ack) => {
+    try {
+      socket.join(boardId);
+      const inRoom = socket.rooms.has(boardId);
+
+      // Acknowledge back to the client so it can verify join status
+      if (typeof ack === 'function') {
+        ack({ ok: inRoom, boardId, rooms: Array.from(socket.rooms) });
+      }
+
+      // Optional: also emit a one-way confirmation event
+      socket.emit("joined-board", { ok: inRoom, boardId });
+
+      console.log(`✅ User ${socket.id} joined board: ${boardId} ok=${inRoom}`);
+      console.log(`📋 Socket ${socket.id} is now in rooms:`, Array.from(socket.rooms));
+    } catch (e) {
+      if (typeof ack === 'function') {
+        ack({ ok: false, boardId, error: e?.message || 'join failed' });
+      }
+      console.error(`��� join-board error for ${socket.id} -> ${boardId}:`, e);
+    }
   });
 
   // Listen for task updates

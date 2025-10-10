@@ -1,7 +1,7 @@
 // client/src/hooks/useActivityLog.js
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { io } from 'socket.io-client';
+import socket from '../socket';
 import API from '../api/api';
 
 export const useActivityLog = () => {
@@ -39,17 +39,21 @@ export const useActivityLog = () => {
     // Initial fetch
     fetchLogs();
 
-    // Set up socket connection for real-time updates
-    const socket = io(import.meta.env.VITE_API_URL);
-
-    // Join the board room if boardId exists
+    // Join the board room if boardId exists, with ack verification
     if (boardId) {
-      socket.emit('join-board', boardId);
+      console.log('[ActivityLog] Attempting to join board room:', boardId);
+      socket.emit('join-board', boardId, (resp) => {
+        if (!resp?.ok) {
+          console.warn('[ActivityLog] join-board failed:', resp);
+        } else {
+          console.log('[ActivityLog] ✅ Successfully joined room:', resp.boardId, 'rooms:', resp.rooms);
+        }
+      });
     }
 
-    // Listen for new activity logs
-    socket.on('activity-logged', (newActivity) => {
-      console.log('New activity received:', newActivity);
+    // Handler for new activity logs
+    const handleActivityLogged = (newActivity) => {
+      console.log('[ActivityLog] 🔔 New activity received:', newActivity);
       if (newActivity && newActivity._id) {
         setLogs(prevLogs => {
           // Check if activity already exists to avoid duplicates
@@ -75,16 +79,28 @@ export const useActivityLog = () => {
           return prevLogs;
         });
       }
-    });
+    };
 
-    // Handle socket connection errors
-    socket.on('connect_error', (err) => {
-      console.error('Socket connection error:', err);
-    });
+    // Attach socket listeners on shared socket
+    console.log('[ActivityLog] Attaching activity-logged listener for boardId:', boardId);
+    socket.on('activity-logged', handleActivityLogged);
 
-    // Cleanup function
+    const onConnect = () => {
+      console.log('[ActivityLog] Socket connected, ID:', socket.id);
+    };
+    socket.on('connect', onConnect);
+
+    const onConnectError = (err) => {
+      console.error('[ActivityLog] Socket connection error:', err);
+    };
+    socket.on('connect_error', onConnectError);
+
+    // Cleanup function: remove listeners (do not disconnect shared socket)
     return () => {
-      socket.disconnect();
+      console.log('[ActivityLog] Cleaning up listeners for boardId:', boardId);
+      socket.off('activity-logged', handleActivityLogged);
+      socket.off('connect', onConnect);
+      socket.off('connect_error', onConnectError);
     };
   }, [boardId]); // Re-run when boardId changes
 

@@ -5,7 +5,7 @@ import { useParams } from "react-router-dom";
 import NavBar from "../components/navBar"; // Ensure the path is correct
 import "./Homepage.css"; // optional if you want to add styles
 import { toast } from "react-toastify";
-import { io } from "socket.io-client";
+import socket from "../socket";
 import TaskCard from "../components/TaskCard"; // Ensure the path is correct
 import TaskModal from "../components/TaskModal";
 import TaskCreationModal from "../components/TaskCreationModal";
@@ -13,8 +13,6 @@ import DeleteConfirmationModal from "../components/DeleteConfirmationModal";
 import ConflictResolutionModal from "../components/ConflictResolutionModal";
 import ActivityLogContainer from '../components/ActivityLog/ActivityLogContainer';
 
-
-const socket = io(import.meta.env.VITE_API_URL);
 
 function Homepage() {
   // State to manage desktop activity log visibility
@@ -210,8 +208,15 @@ function Homepage() {
     };
     fetchTasks();
 
-    // Socket join
-    socket.emit("join-board", boardId);
+    // Socket join with ack verification
+    console.log('[Homepage] Attempting to join board room:', boardId);
+    socket.emit("join-board", boardId, (resp) => {
+      if (!resp?.ok) {
+        console.warn('[Homepage] join-board failed:', resp);
+      } else {
+        console.log('[Homepage] ✅ Successfully joined room:', resp.boardId, 'rooms:', resp.rooms);
+      }
+    });
   }, [boardId]);
 
   // Group tasks by status with safety checks
