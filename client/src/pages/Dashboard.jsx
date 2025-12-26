@@ -69,16 +69,24 @@ const Dashboard = ({ user }) => {
     if (!newBoardName.trim()) return;
 
     try {
+      // Create the board
       const res = await API.post("/api/boards", { name: newBoardName });
-      // Update user last active board immediately
-      await API.put("/api/users/last-active-board", { boardId: res.data._id });
-      
-      // Update local state
-      setBoards(prev => [...prev, res.data]);
+
+      // Update local state immediately after successful board creation
+      setBoards((prev) => [...prev, res.data]);
       setLastActiveBoard(res.data);
       setNewBoardName("");
-      
-      navigate(`/board/${res.data._id}`);
+
+      // Navigate to the new board
+      navigate(`/board/${res.data.board._id}`);
+
+      // Attempt to update the user's last active board
+      try {
+        await API.put("/api/users/last-active-board", { boardId: res.data.board._id });
+      } catch (err) {
+        console.error("Failed to update last active board:", err);
+        toast.error("Board created, but failed to update last active board.");
+      }
     } catch (err) {
       console.error("Failed to create board:", err);
       toast.error(err.response?.data?.message || "Error creating board. Try a different name.");

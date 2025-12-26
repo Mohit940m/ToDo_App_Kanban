@@ -3,14 +3,22 @@ const User = require('../models/User');
 
 const createBoard = async (req, res) => {
   try {
+    const existing = await Board.findOne({ name: req.body.name });
+    if (existing) {
+      return res.status(400).json({ message: "Board with this name already exists" });
+    }
     const board = await Board.create({
       name: req.body.name,
       createdBy: req.user._id,
       members: [req.user._id],
     });
-    res.status(201).json(board);
+    return res.status(201).json({
+      success: true,
+      board,
+      message: "Board created successfully",
+    });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    return res.status(500).json({ message: error.message });
   }
 };
 
