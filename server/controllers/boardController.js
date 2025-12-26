@@ -27,9 +27,9 @@ const getUserBoards = async (req, res) => {
     const boards = await Board.find({ members: req.user._id })
       .populate("createdBy", "name email")
       .select("name createdBy members createdAt updatedAt");
-    res.json(boards);
+    return res.json(boards);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    return res.status(500).json({ message: error.message });
   }
 };
 
@@ -46,9 +46,9 @@ const getBoardDetails = async (req, res) => {
     if (!isMember) {
       return res.status(403).json({ message: "Access denied" });
     }
-    res.json(board);
+    return res.json(board);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    return res.status(500).json({ message: error.message });
   }
 };
 
@@ -71,9 +71,9 @@ const updateBoard = async (req, res) => {
       .populate("createdBy", "name email")
       .populate("members", "name email");
 
-    res.json(updatedBoard);
+    return res.json(updatedBoard);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    return res.status(500).json({ message: error.message });
   }
 };
 
@@ -94,9 +94,9 @@ const addUserToBoard = async (req, res) => {
       await board.save();
     }
 
-    res.json({ message: "User added to board" });
+    return res.json({ message: "User added to board" });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    return res.status(500).json({ message: error.message });
   }
 };
 
@@ -146,9 +146,9 @@ const renameBoard = async (req, res) => {
       .populate("createdBy", "name email")
       .populate("members", "name email");
 
-    res.json(updatedBoard);
+    return res.json(updatedBoard);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    return res.status(500).json({ message: error.message });
   }
 };
 
@@ -166,9 +166,9 @@ const deleteBoard = async (req, res) => {
     await Task.deleteMany({ board: req.params.id });
 
     await board.deleteOne();
-    res.json({ message: "Board and all associated tasks deleted successfully" });
+    return res.json({ message: "Board and all associated tasks deleted successfully" });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    return res.status(500).json({ message: error.message });
   }
 };
 

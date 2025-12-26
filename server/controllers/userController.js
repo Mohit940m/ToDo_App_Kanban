@@ -30,7 +30,7 @@ const registerUser = async (req, res) => {
 
         const token = generateToken(user._id);
 
-        res.status(201).json({
+        return res.status(201).json({
             _id: user._id,
             name: user.name,
             email: user.email,
@@ -38,7 +38,7 @@ const registerUser = async (req, res) => {
         });
     } catch (error) {
         console.error("Register error:", error.message);
-        res.status(500).json({ message: 'Server error' });
+        return res.status(500).json({ message: 'Server error' });
     }
 };
 
@@ -58,7 +58,7 @@ const loginUser = async (req, res) => {
         const token = generateToken(user._id);
 
 
-        res.json({
+        return res.json({
             _id: user._id,
             name: user.name,
             email: user.email,
@@ -66,7 +66,7 @@ const loginUser = async (req, res) => {
         });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: 'Server error' });
+        return res.status(500).json({ message: 'Server error' });
     }
 };
 
@@ -74,10 +74,10 @@ const loginUser = async (req, res) => {
 const getAllUsers = async (req, res) => {
     try {
         const users = await User.find({}, 'name email username').sort({ name: 1 });
-        res.json(users);
+        return res.json(users);
     } catch (error) {
         console.error("Get users error:", error.message);
-        res.status(500).json({ message: 'Server error' });
+        return res.status(500).json({ message: 'Server error' });
     }
 };
 
@@ -115,11 +115,11 @@ const getLeastBusyUser = async (req, res) => {
     taskCounts.sort((a, b) => a.count - b.count);
 
     // 5. Return the least busy user
-    res.json(taskCounts[0].user);
+    return res.json(taskCounts[0].user);
     
   } catch (err) {
     console.error(err); // Log the error for debugging
-    res.status(500).json({ message: "Failed to calculate workload" });
+    return res.status(500).json({ message: "Failed to calculate workload" });
   }
 };
 
@@ -133,7 +133,7 @@ const setLastActiveBoard = async (req, res) => {
   user.lastActiveBoard = boardId;
   await user.save();
 
-  res.status(200).json({ message: "Last active board updated" });
+  return res.status(200).json({ message: "Last active board updated" });
 };
 
 //  
@@ -145,7 +145,7 @@ const getUserDashboard = async (req, res) => {
     .populate("createdBy", "_id name")
     .lean();
 
-  res.status(200).json({
+  return res.status(200).json({
     boards,
     lastActiveBoard: user.lastActiveBoard,
   });

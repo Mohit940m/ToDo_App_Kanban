@@ -32,9 +32,9 @@ const getTasks = async (req, res) => {
       .populate("createdBy", "name email")
       .populate("assignedTo", "name email")
       .populate("board", "name");
-    res.status(200).json(tasks);
+    return res.status(200).json(tasks);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    return res.status(500).json({ message: error.message });
   }
 };
 
@@ -86,10 +86,10 @@ const createTask = async (req, res) => {
       description: `Created task "${newTask.title}"`,
       boardId: board,
     }, global.io);
-    res.status(201).json(populatedTask);
-    console.log("Task created:", populatedTask);
+    return res.status(201).json(populatedTask);
+    // console.log("Task created:", populatedTask);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    return res.status(500).json({ message: error.message });
   }
 };
 
@@ -156,10 +156,10 @@ const updateTask = async (req, res) => {
       boardId: updated.board,
     }, global.io);
 
-    res.status(200).json(updated);
+    return res.status(200).json(updated);
     console.log("Task updated:", updated);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    return res.status(500).json({ message: error.message });
     console.error("Error updating task:", error);
   }
 };
@@ -191,10 +191,10 @@ const deleteTask = async (req, res) => {
     }, global.io);
 
     await task.deleteOne();
-    res.status(200).json({ message: "Task deleted" });
+    return res.status(200).json({ message: "Task deleted" });
     console.log("Task deleted:", id);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    return res.status(500).json({ message: error.message });
     console.error("Error deleting task:", error);
   }
 };

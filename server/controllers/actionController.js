@@ -65,10 +65,10 @@ const getRecentActions = async (req, res) => {
     }).slice(0, 20); // Limit to 20 after filtering
 
     console.log("Filtered actions:", filteredActions.length);
-    res.json(filteredActions);
+    return res.json(filteredActions);
   } catch (err) {
     console.error("Error fetching actions:", err);
-    res.status(500).json({ message: "Failed to fetch actions" });
+    return res.status(500).json({ message: "Failed to fetch actions" });
   }
 };
 
